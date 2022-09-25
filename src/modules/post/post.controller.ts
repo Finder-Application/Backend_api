@@ -19,11 +19,9 @@ import {
 import type { PageDto } from '../../common/dto/page.dto';
 import { RoleType } from '../../constants';
 import { ApiPageOkResponse, Auth, AuthUser, UUIDParam } from '../../decorators';
-import { UseLanguageInterceptor } from '../../interceptors/language-interceptor.service';
-import { UserEntity } from '../user/user.entity';
 import { CreatePostDto } from './dtos/create-post.dto';
-import { PostDto } from './dtos/post.dto';
 import { PostPageOptionsDto } from './dtos/post-page-options.dto';
+import { PostDto } from './dtos/post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { PostService } from './post.service';
 
@@ -32,25 +30,8 @@ import { PostService } from './post.service';
 export class PostController {
   constructor(private postService: PostService) {}
 
-  @Post()
-  @Auth([RoleType.USER])
-  @HttpCode(HttpStatus.CREATED)
-  @ApiCreatedResponse({ type: PostDto })
-  async createPost(
-    @Body() createPostDto: CreatePostDto,
-    @AuthUser() user: UserEntity,
-  ) {
-    const postEntity = await this.postService.createPost(
-      user.id,
-      createPostDto,
-    );
-
-    return postEntity.toDto();
-  }
-
   @Get()
   @Auth([RoleType.USER])
-  @UseLanguageInterceptor()
   @ApiPageOkResponse({ type: PostDto })
   async getPosts(
     @Query() postsPageOptionsDto: PostPageOptionsDto,

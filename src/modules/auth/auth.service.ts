@@ -1,52 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Accounts } from 'database/entities/Accounts';
+import { UserDto } from 'modules/user/dtos/user.dto';
+import { GeneratorService } from 'shared/services/generator.service';
+import { Repository } from 'typeorm';
 
-import { validateHash } from '../../common/utils';
-import type { RoleType } from '../../constants';
-import { TokenType } from '../../constants';
-import { UserNotFoundException } from '../../exceptions';
 import { ApiConfigService } from '../../shared/services/api-config.service';
-import type { UserEntity } from '../user/user.entity';
-import { UserService } from '../user/user.service';
+import { LoginPayloadDto } from './dto/LoginPayloadDto';
 import { TokenPayloadDto } from './dto/TokenPayloadDto';
-import type { UserLoginDto } from './dto/UserLoginDto';
+import { UserLoginDto } from './dto/UserLoginDto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     private configService: ApiConfigService,
-    private userService: UserService,
+    @InjectRepository(Accounts)
+    private accountsRepository: Repository<Accounts>,
+    private generatorUuid: GeneratorService,
   ) {}
 
   async createAccessToken(data: {
-    role: RoleType;
-    userId: Uuid;
+    userName: string;
+    uuid: string;
+    userId: number;
   }): Promise<TokenPayloadDto> {
     return new TokenPayloadDto({
       expiresIn: this.configService.authConfig.jwtExpirationTime,
       accessToken: await this.jwtService.signAsync({
+        userName: data.userName,
+        uuid: data.uuid,
         userId: data.userId,
-        type: TokenType.ACCESS_TOKEN,
-        role: data.role,
       }),
     });
   }
 
-  async validateUser(userLoginDto: UserLoginDto): Promise<UserEntity> {
-    const user = await this.userService.findOne({
-      email: userLoginDto.email,
+  async login(userLoginDto: UserLoginDto): Promise<LoginPayloadDto> {
+    const user = await this.accountsRepository.findOne({
+      where: {
+        userName: userLoginDto.email,
+        password: userLoginDto.password,
+      },
+      relations: {
+        users: true,
+      },
     });
 
-    const isPasswordValid = await validateHash(
-      userLoginDto.password,
-      user?.password,
-    );
+    if (user) {
+      const token = await this.createAccessToken({
+        userName: user.userName,
+        uuid: user.uuid,
+        userId: user.users[0].id,
+      });
 
-    if (!isPasswordValid) {
-      throw new UserNotFoundException();
+      return new LoginPayloadDto(new UserDto(user.users[0]), token);
     }
 
-    return user!;
+    throw new NotFoundException('Your user name or password is invalid!');
+  }
+
+  loginByGoogle() {
+    return 'loginByGoogle';
+  }
+
+  //   async register() {}
+
+  registerByGoogle() {
+    return 'registerByGoogle';
+  }
+
+  validateJwt(token: string) {
+    return this.jwtService.verify(token);
   }
 }

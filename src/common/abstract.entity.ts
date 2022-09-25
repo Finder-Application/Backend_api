@@ -43,8 +43,6 @@ export abstract class AbstractEntity<
   })
   updatedAt: Date;
 
-  translations?: AbstractTranslationEntity[];
-
   private dtoClass?: Constructor<DTO, [AbstractEntity, O?]>;
 
   toDto(options?: O): DTO {
