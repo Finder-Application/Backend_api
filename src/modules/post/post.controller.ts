@@ -5,21 +5,13 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Post,
   Put,
   Query,
 } from '@nestjs/common';
-import {
-  ApiAcceptedResponse,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiAcceptedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import type { PageDto } from '../../common/dto/page.dto';
-import { RoleType } from '../../constants';
-import { ApiPageOkResponse, Auth, AuthUser, UUIDParam } from '../../decorators';
-import { CreatePostDto } from './dtos/create-post.dto';
+import { ApiPageOkResponse, Auth, UUIDParam } from '../../decorators';
 import { PostPageOptionsDto } from './dtos/post-page-options.dto';
 import { PostDto } from './dtos/post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
@@ -31,7 +23,7 @@ export class PostController {
   constructor(private postService: PostService) {}
 
   @Get()
-  @Auth([RoleType.USER])
+  @Auth()
   @ApiPageOkResponse({ type: PostDto })
   async getPosts(
     @Query() postsPageOptionsDto: PostPageOptionsDto,
@@ -40,7 +32,7 @@ export class PostController {
   }
 
   @Get(':id')
-  @Auth([])
+  @Auth()
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: PostDto })
   async getSinglePost(@UUIDParam('id') id: Uuid): Promise<PostDto> {

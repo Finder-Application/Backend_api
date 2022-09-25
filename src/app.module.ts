@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthMiddleware } from 'modules/auth/auth.middleware';
 
 import { AuthModule } from 'modules/auth/auth.module';
+import { CommentModule } from 'modules/comments/comments.module';
+import { NotificationModule } from 'modules/notifications/notifications.module';
+import { PostModule } from 'modules/post/post.module';
+import { UserModule } from 'modules/user/user.module';
 import './boilerplate.polyfill';
 import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
 import { ApiConfigService } from './shared/services/api-config.service';
@@ -23,6 +27,10 @@ import { SharedModule } from './shared/shared.module';
     }),
     HealthCheckerModule,
     AuthModule,
+    NotificationModule,
+    UserModule,
+    CommentModule,
+    PostModule,
   ],
   providers: [],
 })
