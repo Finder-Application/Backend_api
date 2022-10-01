@@ -36,4 +36,4 @@ jobs:
           username: finder
           password: Finder123456
           port: 22
-          script: whoami
+          script: docker ps -a
