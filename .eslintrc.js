@@ -116,12 +116,12 @@ module.exports = {
     '@typescript-eslint/member-ordering': 'off',
     '@typescript-eslint/no-angle-bracket-type-assertion': 'off',
     '@typescript-eslint/no-empty-function': 'error',
-    '@typescript-eslint/no-unnecessary-condition': 'error',
+    '@typescript-eslint/no-unnecessary-condition': 'warn',
     '@typescript-eslint/no-confusing-non-null-assertion': 'warn',
     '@typescript-eslint/no-duplicate-enum-values': 'error',
     '@typescript-eslint/no-empty-interface': 'error',
     '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-inferrable-types': 'error',
     '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/ban-ts-comment': 'error',
@@ -213,7 +213,7 @@ module.exports = {
       { blankLine: 'always', prev: 'var', next: '*' },
     ],
     'arrow-body-style': 'error',
-    'arrow-parens': ['error', 'always'],
+    'arrow-parens': ['off', 'always'],
     complexity: 'off',
     'no-restricted-imports': [
       'error',
@@ -240,7 +240,7 @@ module.exports = {
     eqeqeq: ['error', 'smart'],
     'guard-for-in': 'error',
     'id-match': 'error',
-    'max-classes-per-file': ['error', 2],
+    'max-classes-per-file': ['error', 10],
     'max-len': [
       'error',
       {
@@ -253,7 +253,7 @@ module.exports = {
     'no-cond-assign': 'error',
     'no-constant-condition': 'error',
     'no-dupe-else-if': 'error',
-    'lines-between-class-members': ['error', 'always'],
+    'lines-between-class-members': ['off', 'always'],
     'no-console': [
       'error',
       {

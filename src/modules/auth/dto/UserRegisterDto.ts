@@ -1,13 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
   IsString,
   MinLength,
 } from 'class-validator';
-import { Column } from 'typeorm';
 
 import { Trim } from '../../../decorators/transform.decorators';
 
@@ -17,6 +15,13 @@ export class UserRegisterDto {
   @IsNotEmpty()
   @Trim()
   readonly firstName: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @Trim()
+  readonly middleName: string;
 
   @ApiProperty()
   @IsString()
@@ -35,10 +40,4 @@ export class UserRegisterDto {
   @IsString()
   @MinLength(6)
   readonly password: string;
-
-  @ApiProperty()
-  @Column()
-  @IsPhoneNumber()
-  @IsOptional()
-  phone: string;
 }

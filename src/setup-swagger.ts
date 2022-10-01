@@ -55,13 +55,13 @@ Routes is following REST standard (Richardson level 3)
   }
 
   const document = SwaggerModule.createDocument(app, documentBuilder.build());
-  SwaggerModule.setup('documentation', app, document, {
+  SwaggerModule.setup('docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
     },
   });
 
   console.info(
-    `Documentation: http://localhost:${process.env.PORT}/documentation`,
+    `Documentation: http://localhost:${process.env.PORT}/docs`,
   );
 }

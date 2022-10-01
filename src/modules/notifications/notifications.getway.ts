@@ -26,7 +26,7 @@ export class NotificationGateway
   // helper
   getRoomNotify = (userId: number) => `room-notify-${userId}`;
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     const token = client.handshake.query.token?.toString();
     // const payload = this.authService.verifyAccessToken(token);
     // TODO: do it when oke auth
@@ -35,7 +35,7 @@ export class NotificationGateway
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (fakePayload) {
       const nameRoom = this.getRoomNotify(1);
-      client.join(nameRoom);
+      await client.join(nameRoom);
     }
   }
 

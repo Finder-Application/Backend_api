@@ -14,7 +14,17 @@ export function ApiPageOkResponse<T extends Type>(options: {
     ApiOkResponse({
       description: options.description,
       schema: {
-        allOf: [{ $ref: getSchemaPath(PageDto) }],
+        allOf: [
+          { $ref: getSchemaPath(PageDto) },
+          {
+            properties: {
+              results: {
+                type: 'array',
+                items: { $ref: getSchemaPath(options.type) },
+              },
+            },
+          },
+        ],
       },
     }),
   );

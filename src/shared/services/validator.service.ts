@@ -1,10 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { compareSync, genSaltSync, hashSync } from 'bcrypt';
 
 @Injectable()
 export class ValidatorService {
-  public isImage(mimeType: string): boolean {
-    const imageMimeTypes = ['image/jpeg', 'image/png'];
+  salt: string;
+  constructor() {
+    this.salt = genSaltSync(8);
+  }
 
-    return imageMimeTypes.includes(mimeType);
+  public encryptionPassword(password: string): string {
+    return hashSync(password, this.salt);
+  }
+
+  public comparePw(password: string, hashPw: string): boolean {
+    return compareSync(hashPw, password);
   }
 }

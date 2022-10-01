@@ -3,27 +3,27 @@ import {
   HttpStatus,
   UnprocessableEntityException,
   ValidationPipe,
-} from "@nestjs/common";
-import { NestFactory, Reflector } from "@nestjs/core";
-import { Transport } from "@nestjs/microservices";
-import type { NestExpressApplication } from "@nestjs/platform-express";
-import { ExpressAdapter } from "@nestjs/platform-express";
-import compression from "compression";
-import { middleware as expressCtx } from "express-ctx";
-import rateLimit from "express-rate-limit";
-import helmet from "helmet";
-import morgan from "morgan";
+} from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
+import { Transport } from '@nestjs/microservices';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import compression from 'compression';
+import { middleware as expressCtx } from 'express-ctx';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import morgan from 'morgan';
 import {
   initializeTransactionalContext,
   patchTypeORMRepositoryWithBaseRepository,
-} from "typeorm-transactional-cls-hooked";
+} from 'typeorm-transactional-cls-hooked';
 
-import { AppModule } from "./app.module";
-import { HttpExceptionFilter } from "./filters/bad-request.filter";
-import { QueryFailedFilter } from "./filters/query-failed.filter";
-import { setupSwagger } from "./setup-swagger";
-import { ApiConfigService } from "./shared/services/api-config.service";
-import { SharedModule } from "./shared/shared.module";
+import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './filters/bad-request.filter';
+import { QueryFailedFilter } from './filters/query-failed.filter';
+import { setupSwagger } from './setup-swagger';
+import { ApiConfigService } from './shared/services/api-config.service';
+import { SharedModule } from './shared/shared.module';
 
 export async function bootstrap(): Promise<NestExpressApplication> {
   initializeTransactionalContext();
@@ -31,26 +31,26 @@ export async function bootstrap(): Promise<NestExpressApplication> {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
     new ExpressAdapter(),
-    { cors: true }
+    { cors: true },
   );
-  app.enable("trust proxy"); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+  app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
   app.use(helmet());
   // app.setGlobalPrefix('/api'); use api as global prefix if you don't have subdomain
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       max: 100, // limit each IP to 100 requests per windowMs
-    })
+    }),
   );
   app.use(compression());
-  app.use(morgan("combined"));
+  app.use(morgan('combined'));
   app.enableVersioning();
 
   const reflector = app.get(Reflector);
 
   app.useGlobalFilters(
     new HttpExceptionFilter(reflector),
-    new QueryFailedFilter(reflector)
+    new QueryFailedFilter(reflector),
   );
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
@@ -61,8 +61,8 @@ export async function bootstrap(): Promise<NestExpressApplication> {
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       transform: true,
       dismissDefaultMessages: true,
-      exceptionFactory: (errors) => new UnprocessableEntityException(errors),
-    })
+      exceptionFactory: errors => new UnprocessableEntityException(errors),
+    }),
   );
 
   const configService = app.select(SharedModule).get(ApiConfigService);
@@ -74,7 +74,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
       transport: Transport.NATS,
       options: {
         url: `nats://${natsConfig.host}:${natsConfig.port}`,
-        queue: "main_service",
+        queue: 'main_service',
       },
     });
 

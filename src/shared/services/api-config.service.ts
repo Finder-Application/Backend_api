@@ -104,6 +104,13 @@ export class ApiConfigService {
     };
   }
 
+  get configGoogle() {
+    return {
+      clientId: '',
+      clientSecret: '',
+    };
+  }
+
   private get(key: string): string {
     const value = this.configService.get<string>(key);
 
