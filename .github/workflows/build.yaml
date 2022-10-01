@@ -1,0 +1,10 @@
+name: CI-CD Backend
+on:
+  push:
+    branches: [main]
+  jobs:
+    docker:
+      runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
