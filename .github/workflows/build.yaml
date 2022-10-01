@@ -39,3 +39,4 @@ jobs:
           script: |
             cd build/  
             vim docker-compose.yml
+            :wq
