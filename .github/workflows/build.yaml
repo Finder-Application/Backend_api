@@ -38,5 +38,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd build/  
-            vim docker-compose.yml
-            :wq
+            ls
