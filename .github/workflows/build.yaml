@@ -40,6 +40,4 @@ jobs:
           script: |
             cd build/  
             cd Backend_api/
-            git pull
-            cin12211
-            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
+            git pull https://cin12211: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@github.com/cin12211/Finder-Application/Backend_api.git
