@@ -45,4 +45,4 @@ jobs:
             cd ..
             ls
             docker ps
-            docker compose up --build backend-api
+            docker compose up --build backend-api -d
