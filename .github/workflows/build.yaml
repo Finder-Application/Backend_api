@@ -41,3 +41,4 @@ jobs:
             cd build/  
             cd Backend_api/
             ls
+            git pull origin main
