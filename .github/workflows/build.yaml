@@ -40,5 +40,6 @@ jobs:
           script: |
             cd build/  
             cd Backend_api/
-            ls
+            git config --global user.name "cin12211"
+            git config --global user.email "taccin03@gmail.com"
             git pull origin main
