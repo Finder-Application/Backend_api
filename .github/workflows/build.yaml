@@ -38,4 +38,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd build/  
-            ls
+            cd Backend_api/
+            git pull
+            cd ..
+            docker compose up --build backend-api
