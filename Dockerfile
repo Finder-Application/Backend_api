@@ -5,10 +5,11 @@ RUN yarn install
 
 COPY . ./
 
+RUN rm -rf tsconfig.build.tsbuildinfo
+
 RUN yarn build
 
 RUN rm -rf tsconfig.build.tsbuildinfo
-
 
 FROM node:lts AS node_modules
 COPY package.json yarn.lock ./
