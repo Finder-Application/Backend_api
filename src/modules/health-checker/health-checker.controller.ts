@@ -8,7 +8,7 @@ import {
 
 import { ServiceHealthIndicator } from './health-indicators/service.indicator';
 
-@Controller('health')
+@Controller('health-check')
 export class HealthCheckerController {
   constructor(
     private healthCheckService: HealthCheckService,
