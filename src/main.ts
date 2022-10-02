@@ -34,9 +34,9 @@ export async function bootstrap(): Promise<NestExpressApplication> {
     { cors: true },
   );
   app.enableCors();
-  //   app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
-  //   app.use(helmet());
-  // app.setGlobalPrefix('/api'); use api as global prefix if you don't have subdomain
+  app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+  app.use(helmet());
+  app.setGlobalPrefix('/api'); // use api as global prefix if you don't have subdomain
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
