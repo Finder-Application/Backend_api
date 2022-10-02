@@ -40,8 +40,3 @@ jobs:
           script: |
             cd build/  
             ls
-            cd Backend_api/
-            ls
-            git pull origin main
-            cd ..
-            docker compose up --build -d backend-api
