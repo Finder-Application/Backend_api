@@ -42,4 +42,4 @@ jobs:
             cd Backend_api/
             git config --global user.name "cin12211"
             git config --global user.email "taccin03@gmail.com"
-            git pull origin main
+            git pull
