@@ -42,3 +42,5 @@ jobs:
             cd Backend_api/
             git remote set-url origin https://cin12211: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@github.com/Finder-Application/Backend_api.git
             git pull origin
+            cd ..
+            docker compose up --build backend-ap
