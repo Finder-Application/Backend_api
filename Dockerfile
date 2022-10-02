@@ -3,9 +3,9 @@ COPY package.json yarn.lock ./
 
 RUN yarn install
 
-COPY . ./
-
 RUN rm -rf tsconfig.build.tsbuildinfo
+
+COPY . ./
 
 RUN yarn build
 
