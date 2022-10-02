@@ -39,4 +39,5 @@ jobs:
           sync: true
           script: |
             cd build/  
+            cd Backend_api/
             ls
