@@ -5,7 +5,7 @@ export function setupSwagger(app: INestApplication): void {
   const documentBuilder = new DocumentBuilder()
     .setTitle('API')
     .setDescription(
-      `### REST FULL
+      `### REST FULL ----
 
 Routes is following REST standard (Richardson level 3)
 
