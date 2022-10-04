@@ -1,13 +1,11 @@
 import {
-  Column,
   CreateDateColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-import { LanguageCode } from '../constants';
 import type { Constructor } from '../types';
-import type { AbstractDto, AbstractTranslationDto } from './dto/abstract.dto';
+import type { AbstractDto } from './dto/abstract.dto';
 
 /**
  * Abstract Entity
@@ -58,10 +56,10 @@ export abstract class AbstractEntity<
   }
 }
 
-export class AbstractTranslationEntity<
-  DTO extends AbstractTranslationDto = AbstractTranslationDto,
-  O = never,
-> extends AbstractEntity<DTO, O> {
-  @Column({ type: 'enum', enum: LanguageCode })
-  languageCode: LanguageCode;
-}
+// export class AbstractTranslationEntity<
+//   DTO extends AbstractTranslationDto = AbstractTranslationDto,
+//   O = never,
+// > extends AbstractEntity<DTO, O> {
+//   @Column({ type: 'enum', enum: LanguageCode })
+//   languageCode: LanguageCode;
+// }

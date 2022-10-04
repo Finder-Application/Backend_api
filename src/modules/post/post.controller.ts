@@ -5,14 +5,16 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Put,
   Query,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ApiAcceptedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { PageOptionsDto } from 'common/dto/page-options.dto';
+import { PageDto } from 'common/dto/page.dto';
 
-import type { PageDto } from '../../common/dto/page.dto';
 import { ApiPageOkResponse, Auth, UUIDParam } from '../../decorators';
-import { PostPageOptionsDto } from './dtos/post-page-options.dto';
 import { PostDto } from './dtos/post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { PostService } from './post.service';
@@ -23,22 +25,20 @@ export class PostController {
   constructor(private postService: PostService) {}
 
   @Get()
-  @Auth()
   @ApiPageOkResponse({ type: PostDto })
-  async getPosts(
-    @Query() postsPageOptionsDto: PostPageOptionsDto,
+  getPostsPagination(
+    @Query(new ValidationPipe({ transform: true }))
+    pageOptionsDto: PageOptionsDto,
   ): Promise<PageDto<PostDto>> {
-    return this.postService.getAllPost(postsPageOptionsDto);
+    return this.postService.getPostsPagination(pageOptionsDto);
   }
 
   @Get(':id')
-  @Auth()
+  @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: PostDto })
-  async getSinglePost(@UUIDParam('id') id: Uuid): Promise<PostDto> {
-    const entity = await this.postService.getSinglePost(id);
-
-    return entity.toDto();
+  async getSinglePost(@Param('id') id: Uuid) {
+    return this.postService.getSinglePost(id);
   }
 
   @Put(':id')

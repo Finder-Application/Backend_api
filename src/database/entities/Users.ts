@@ -73,7 +73,7 @@ export class Users {
   )
   commentNotifications: CommentNotifications[];
 
-  @OneToMany(() => Comments, (comments) => comments.profile)
+  @OneToMany(() => Comments, (comments) => comments.user)
   comments: Comments[];
 
   @OneToMany(
@@ -82,7 +82,7 @@ export class Users {
   )
   postNotifications: PostNotifications[];
 
-  @OneToMany(() => Posts, (posts) => posts.profile)
+  @OneToMany(() => Posts, (posts) => posts.user)
   posts: Posts[];
 
   @ManyToOne(() => Accounts, (accounts) => accounts.users, {

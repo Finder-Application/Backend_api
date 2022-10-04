@@ -1,52 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Transactional } from 'typeorm-transactional-cls-hooked';
 
-import type { PageDto } from '../../common/dto/page.dto';
+import { PageDto } from 'common/dto/page.dto';
+import { Posts } from 'database/entities/Posts';
 import { ValidatorService } from '../../shared/services/validator.service';
-import { CreatePostCommand } from './commands/create-post.command';
-import { CreatePostDto } from './dtos/create-post.dto';
-import type { PostDto } from './dtos/post.dto';
-import type { PostPageOptionsDto } from './dtos/post-page-options.dto';
+import { PostPageOptionsDto } from './dtos/post-page-options.dto';
+import { PostDto } from './dtos/post.dto';
 import type { UpdatePostDto } from './dtos/update-post.dto';
 import { PostNotFoundException } from './exceptions/post-not-found.exception';
-import { PostEntity } from './post.entity';
 
 @Injectable()
 export class PostService {
   constructor(
-    @InjectRepository(PostEntity)
-    private postRepository: Repository<PostEntity>,
+    @InjectRepository(Posts)
+    private postRepository: Repository<Posts>,
     private validatorService: ValidatorService,
     private commandBus: CommandBus,
   ) {}
 
-  @Transactional()
-  createPost(userId: Uuid, createPostDto: CreatePostDto): Promise<PostEntity> {
-    return this.commandBus.execute<CreatePostCommand, PostEntity>(
-      new CreatePostCommand(userId, createPostDto),
-    );
-  }
+  //   @Transactional()
+  //   createPost(userId: Uuid, createPostDto: CreatePostDto): Promise<PostEntity> {
+  //     return this.commandBus.execute<CreatePostCommand, PostEntity>(
+  //       new CreatePostCommand(userId, createPostDto),
+  //     );
+  //   }
 
-  async getAllPost(
-    postPageOptionsDto: PostPageOptionsDto,
+  async getPostsPagination(
+    pageOptionsDto: PostPageOptionsDto,
   ): Promise<PageDto<PostDto>> {
-    const queryBuilder = this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.translations', 'postTranslation');
-    const [items, pageMetaDto] = await queryBuilder.paginate(
-      postPageOptionsDto,
-    );
+    try {
+      const queryBuilder = this.postRepository
+        .createQueryBuilder('posts')
+        .leftJoinAndSelect('posts.user', 'user');
 
-    return items.toPageDto(pageMetaDto);
+      const [items, pageMetaDto] = await queryBuilder.paginate(
+        pageOptionsDto,
+        e => new PostDto(e),
+      );
+
+      return items.toPageDto<PostDto>(pageMetaDto);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
-  async getSinglePost(id: Uuid): Promise<PostEntity> {
+  async getSinglePost(id: Uuid): Promise<PostDto> {
     const queryBuilder = this.postRepository
-      .createQueryBuilder('post')
-      .where('post.id = :id', { id });
+      .createQueryBuilder('posts')
+      .where('posts.id = :id', { id })
+      .leftJoinAndSelect('posts.user', 'user');
 
     const postEntity = await queryBuilder.getOne();
 
@@ -54,7 +58,7 @@ export class PostService {
       throw new PostNotFoundException();
     }
 
-    return postEntity;
+    return new PostDto(postEntity);
   }
 
   async updatePost(id: Uuid, updatePostDto: UpdatePostDto): Promise<void> {

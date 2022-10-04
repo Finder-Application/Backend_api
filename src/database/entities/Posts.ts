@@ -12,14 +12,14 @@ import { PostNotifications } from "./PostNotifications";
 import { RelevantNetworkPosts } from "./RelevantNetworkPosts";
 import { Users } from "./Users";
 
-@Index("fk_posts_profile_id_idx", ["profileId"], {})
+@Index("fk_posts_profile_id_idx", ["userId"], {})
 @Entity("posts", { schema: "capstone_prod" })
 export class Posts {
   @Column("int", { primary: true, name: "id" })
   id: number;
 
-  @Column("int", { name: "profile_id" })
-  profileId: number;
+  @Column("int", { name: "user_id" })
+  userId: number;
 
   @Column("varchar", { name: "first_name", length: 45 })
   firstName: string;
@@ -30,8 +30,8 @@ export class Posts {
   @Column("time", { name: "date_of_birth", nullable: true })
   dateOfBirth: string | null;
 
-  @Column("tinyblob", { name: "gender" })
-  gender: Buffer;
+  @Column("tinyint", { name: "gender", nullable: true, width: 1 })
+  gender: boolean | null;
 
   @Column("varchar", { name: "lost_address", nullable: true, length: 200 })
   lostAddress: string | null;
@@ -73,8 +73,8 @@ export class Posts {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "profile_id", referencedColumnName: "id" }])
-  profile: Users;
+  @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
+  user: Users;
 
   @OneToMany(
     () => RelevantNetworkPosts,

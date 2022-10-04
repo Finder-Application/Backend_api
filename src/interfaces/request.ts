@@ -1,6 +1,6 @@
 import { Request } from 'express';
 // eslint-disable-next-line @typescript-eslint/naming-convention
-interface Session {
+export interface Session {
   userName: string;
   uuid: string;
   userId: number;

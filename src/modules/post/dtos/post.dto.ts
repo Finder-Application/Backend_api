@@ -1,28 +1,60 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Posts } from 'database/entities/Posts';
+import { UserPublicDto } from 'modules/user/dtos/user.dto';
 
-import { AbstractDto } from '../../../common/dto/abstract.dto';
-import { DynamicTranslate, StaticTranslate } from '../../../decorators';
-import type { PostEntity } from '../post.entity';
-import { PostTranslationDto } from './post-translation.dto';
+export class PostDto {
+  @ApiProperty()
+  id: number;
 
-export class PostDto extends AbstractDto {
+  @ApiProperty()
+  firstName: string;
+
+  @ApiProperty()
+  latsName: string;
+
+  @ApiPropertyOptional({ type: Date })
+  dateOfBirth: string | null;
+
   @ApiPropertyOptional()
-  @DynamicTranslate()
-  title?: string;
+  gender: boolean | null;
 
   @ApiPropertyOptional()
-  description?: string;
+  lostAddress: string | null;
 
   @ApiPropertyOptional()
-  @StaticTranslate()
-  info: string;
+  hometown: string | null;
 
-  @ApiPropertyOptional({ type: PostTranslationDto, isArray: true })
-  translations?: PostTranslationDto[];
+  @ApiPropertyOptional({ type: Date })
+  lostTime: string | null;
 
-  constructor(postEntity: PostEntity) {
-    super(postEntity);
+  @ApiPropertyOptional()
+  relationship: string | null;
 
-    this.info = 'keywords.admin';
+  @ApiPropertyOptional()
+  photos: string | null;
+
+  @ApiPropertyOptional()
+  relevantPosts: string | null;
+
+  @ApiPropertyOptional()
+  shareCount: number | null;
+
+  @ApiProperty({ type: UserPublicDto })
+  user: UserPublicDto;
+
+  constructor(post: Posts) {
+    this.id = post.id;
+    this.firstName = post.firstName;
+    this.latsName = post.latsName;
+    this.dateOfBirth = post.dateOfBirth;
+    this.gender = post.gender;
+    this.lostAddress = post.lostAddress;
+    this.hometown = post.hometown;
+    this.lostTime = post.lostTime;
+    this.relationship = post.relationship;
+    this.photos = post.photos;
+    this.relevantPosts = post.relevantPosts;
+    this.shareCount = post.shareCount;
+    this.user = new UserPublicDto(post.user);
   }
 }

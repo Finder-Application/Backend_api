@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
+import { Users } from 'database/entities/Users';
+import { NotFoundError } from 'rxjs';
 import type { FindOptionsWhere } from 'typeorm';
 import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
@@ -12,23 +14,29 @@ import { IFile } from '../../interfaces';
 import { ValidatorService } from '../../shared/services/validator.service';
 import { UserRegisterDto } from '../auth/dto/UserRegisterDto';
 import { CreateSettingsDto } from './dtos/create-settings.dto';
-import type { UserDto } from './dtos/user.dto';
+import { UserDto } from './dtos/user.dto';
 import type { UsersPageOptionsDto } from './dtos/users-page-options.dto';
 
 @Injectable()
 export class UserService {
-  //   constructor(
-  //     @InjectRepository(UserEntity)
-  //     private userRepository: Repository<UserEntity>,
-  //     private validatorService: ValidatorService,
-  //     private commandBus: CommandBus,
-  //   ) {}
+  constructor(
+    @InjectRepository(Users)
+    private userRepository: Repository<Users>,
+    private validatorService: ValidatorService,
+    private commandBus: CommandBus,
+  ) {}
+
   //   /**
   //    * Find single user
   //    */
-  //   findOne(findData: FindOptionsWhere<UserEntity>): Promise<UserEntity | null> {
-  //     return this.userRepository.findOneBy(findData);
-  //   }
+  async findOne(findData: FindOptionsWhere<Users>): Promise<UserDto> {
+    const user = await this.userRepository.findOneBy(findData);
+
+    if (user) {
+      return new UserDto(user);
+    }
+    throw new NotFoundError('User invalid');
+  }
   //   async findByUsernameOrEmail(
   //     options: Partial<{ username: string; email: string }>,
   //   ): Promise<UserEntity | null> {

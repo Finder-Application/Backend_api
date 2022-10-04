@@ -106,8 +106,8 @@ export class ApiConfigService {
 
   get configGoogle() {
     return {
-      clientId: '',
-      clientSecret: '',
+      clientId: this.getString('GOOGLE_CLIENT_ID'),
+      clientSecret: this.getString('GOOGLE_CLIENT_SECRET'),
     };
   }
 

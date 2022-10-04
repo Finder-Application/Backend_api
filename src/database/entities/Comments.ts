@@ -11,7 +11,7 @@ import { CommentNotifications } from "./CommentNotifications";
 import { Posts } from "./Posts";
 import { Users } from "./Users";
 
-@Index("fk_comment_profile_id_idx", ["profileId"], {})
+@Index("fk_comment_profile_id_idx", ["userId"], {})
 @Index("fb_comment_post_id_idx", ["postId"], {})
 @Entity("comments", { schema: "capstone_prod" })
 export class Comments {
@@ -24,8 +24,8 @@ export class Comments {
   @Column("int", { name: "post_id" })
   postId: number;
 
-  @Column("int", { name: "profile_id" })
-  profileId: number;
+  @Column("int", { name: "user_id" })
+  userId: number;
 
   @Column("varchar", { name: "photos", nullable: true, length: 200 })
   photos: string | null;
@@ -50,6 +50,6 @@ export class Comments {
     onDelete: "NO ACTION",
     onUpdate: "NO ACTION",
   })
-  @JoinColumn([{ name: "profile_id", referencedColumnName: "id" }])
-  profile: Users;
+  @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
+  user: Users;
 }
