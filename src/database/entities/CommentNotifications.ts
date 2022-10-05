@@ -18,6 +18,9 @@ export class CommentNotifications {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
+  @Column("int", { name: "user_id" })
+  userId: number;
+
   @Column("int", { name: "post_id" })
   postId: number;
 
@@ -36,9 +39,6 @@ export class CommentNotifications {
     length: 45,
   })
   commentNotificationscol: string | null;
-
-  @Column("int", { name: "user_id" })
-  userId: number;
 
   @ManyToOne(() => Comments, (comments) => comments.commentNotifications, {
     onDelete: "NO ACTION",

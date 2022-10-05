@@ -51,7 +51,7 @@ export class Posts {
   @Column("varchar", { name: "relevant_posts", nullable: true, length: 45 })
   relevantPosts: string | null;
 
-  @Column("int", { name: "share_count", nullable: true, default: () => "'1'" })
+  @Column("int", { name: "share_count", nullable: true, default: () => "'0'" })
   shareCount: number | null;
 
   @OneToMany(
