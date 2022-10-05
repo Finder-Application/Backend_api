@@ -55,7 +55,7 @@ export class CommentService {
       .execute();
 
     if (!findComment.affected) {
-      throw new NotFoundException('Your comment not exit!');
+      throw new NotFoundException('Your comment not exit!!');
     }
   }
 }
