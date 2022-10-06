@@ -1,7 +1,7 @@
 FROM node:lts AS dist
 COPY package.json yarn.lock ./
 
-RUN yarn install --network-timeout 1000000
+RUN yarn install --prod --network-timeout 1000000
 
 RUN rm -rf tsconfig.build.tsbuildinfo
 
@@ -14,7 +14,7 @@ RUN rm -rf tsconfig.build.tsbuildinfo
 FROM node:lts AS node_modules
 COPY package.json yarn.lock ./
 
-RUN yarn install --prod
+RUN yarn install --prod --network-timeout 1000000
 
 FROM node:lts
 
