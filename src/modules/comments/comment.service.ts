@@ -1,32 +1,72 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PageOptionsDto } from 'common/dto/page-options.dto';
 import { Comments } from 'database/entities/Comments';
+import { SubComments } from 'database/entities/SubComments';
 import { Session } from 'interfaces/request';
 import { Repository } from 'typeorm';
-import { CreateCommentDto, LikeCommentDto } from './dtos/comment.dto';
+import { CommentDto, CommentIdDto, CreateCommentDto } from './dtos/comment.dto';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(Comments)
     private commentsRepository: Repository<Comments>,
+    @InjectRepository(SubComments)
+    private subCommentsRepository: Repository<SubComments>,
   ) {}
 
   async createComment(createComment: CreateCommentDto, session: Session) {
-    const comment = this.commentsRepository.create({
-      postId: createComment.postId,
-      content: createComment.content,
-      photo: createComment.photo,
-      repFor: createComment.repFor,
-      userId: session.userId,
-    });
+    const comment = createComment.repFor
+      ? this.subCommentsRepository.create({
+          postId: createComment.postId,
+          content: createComment.content,
+          photo: createComment.photo,
+          userId: session.userId,
+          subFor: createComment.repFor,
+        })
+      : this.commentsRepository.create({
+          postId: createComment.postId,
+          content: createComment.content,
+          photo: createComment.photo,
+          userId: session.userId,
+        });
 
-    await this.commentsRepository.save(comment);
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    createComment.repFor
+      ? await this.subCommentsRepository.save(comment)
+      : await this.commentsRepository.save(comment);
 
     return comment;
   }
 
-  async upLikeComment(likeComment: LikeCommentDto) {
+  async getPagination(pageOptionsDto: PageOptionsDto, postId: number) {
+    try {
+      const queryBuilder = this.commentsRepository
+        .createQueryBuilder('comment')
+        .where('comment.postId = :postId', { postId })
+        .leftJoinAndSelect('comment.subComments', 'sub')
+        .leftJoinAndSelect('comment.user', 'user')
+        .leftJoinAndSelect('user.account', 'account')
+        .leftJoinAndSelect('sub.user', 'userSub')
+        .leftJoinAndSelect('userSub.account', 'accountSub');
+
+      const [items, pageMetaDto] = await queryBuilder.paginate(
+        pageOptionsDto,
+        e => new CommentDto(e),
+      );
+
+      return items.toPageDto<CommentDto>(pageMetaDto);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async upLikeComment(likeComment: CommentIdDto) {
     const comment = await this.commentsRepository
       .createQueryBuilder()
       .where('comments.id = :id', { id: likeComment.id })

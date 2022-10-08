@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
+import { Accounts } from 'database/entities/Accounts';
 import { Users } from 'database/entities/Users';
 import { NotFoundError } from 'rxjs';
 import type { FindOptionsWhere } from 'typeorm';
@@ -30,7 +31,12 @@ export class UserService {
   //    * Find single user
   //    */
   async findOne(findData: FindOptionsWhere<Users>): Promise<UserDto> {
-    const user = await this.userRepository.findOneBy(findData);
+    const user = await this.userRepository.findOne({
+      where: {
+        id: findData.id,
+      },
+      relations: ['account'],
+    });
 
     if (user) {
       return new UserDto(user);

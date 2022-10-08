@@ -97,6 +97,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
   await app.listen(port);
 
   console.info(`server running on ${await app.getUrl()}`);
+  console.info(`Documentation: http://localhost:${process.env.PORT}/api/docs`);
 
   return app;
 }

@@ -17,11 +17,15 @@ export class UserPublicDto {
   @ApiPropertyOptional()
   avatar?: string;
 
+  @ApiPropertyOptional()
+  uuid: string;
+
   constructor(user: Users) {
     this.firstName = user.firstName;
     this.lastName = user.lastName;
     this.middleName = user.middleName || '';
     this.avatar = user.avatar || '';
+    this.uuid = user.account.uuid;
   }
 }
 

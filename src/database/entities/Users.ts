@@ -12,6 +12,7 @@ import { CommentNotifications } from "./CommentNotifications";
 import { Comments } from "./Comments";
 import { PostNotifications } from "./PostNotifications";
 import { Posts } from "./Posts";
+import { SubComments } from "./SubComments";
 
 @Index("fk_profile_user_id_idx", ["accountId"], {})
 @Entity("users", { schema: "capstone_prod" })
@@ -84,6 +85,9 @@ export class Users {
 
   @OneToMany(() => Posts, (posts) => posts.user)
   posts: Posts[];
+
+  @OneToMany(() => SubComments, (subComments) => subComments.user)
+  subComments: SubComments[];
 
   @ManyToOne(() => Accounts, (accounts) => accounts.users, {
     onDelete: "NO ACTION",

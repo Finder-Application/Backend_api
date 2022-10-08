@@ -10,6 +10,7 @@ import { CommentNotifications } from "./CommentNotifications";
 import { Comments } from "./Comments";
 import { PostNotifications } from "./PostNotifications";
 import { RelevantNetworkPosts } from "./RelevantNetworkPosts";
+import { SubComments } from "./SubComments";
 import { Users } from "./Users";
 
 @Index("fk_posts_profile_id_idx", ["userId"], {})
@@ -81,4 +82,7 @@ export class Posts {
     (relevantNetworkPosts) => relevantNetworkPosts.post
   )
   relevantNetworkPosts: RelevantNetworkPosts[];
+
+  @OneToMany(() => SubComments, (subComments) => subComments.post)
+  subComments: SubComments[];
 }
