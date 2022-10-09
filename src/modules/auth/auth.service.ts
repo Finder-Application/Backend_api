@@ -56,7 +56,7 @@ export class AuthService {
   }
 
   async login(userLoginDto: UserLoginDto): Promise<LoginPayloadDto> {
-    const user = await this.accountsRepository.findOne({
+    const account = await this.accountsRepository.findOne({
       where: {
         userName: userLoginDto.email,
       },
@@ -66,16 +66,19 @@ export class AuthService {
     });
 
     if (
-      user &&
-      this.validator.comparePw(user.password, userLoginDto.password)
+      account &&
+      this.validator.comparePw(account.password, userLoginDto.password)
     ) {
       const token = await this.createAccessToken({
-        userName: user.userName,
-        uuid: user.uuid,
-        userId: user.users[0].id,
+        userName: account.userName,
+        uuid: account.uuid,
+        userId: account.users[0].id,
       });
 
-      return new LoginPayloadDto(new UserDto(user.users[0]), token);
+      return new LoginPayloadDto(
+        new UserDto(account.users[0], account.uuid),
+        token,
+      );
     }
 
     throw new NotFoundException('Your user name or password is invalid!');
@@ -115,6 +118,11 @@ export class AuthService {
     return this.createAccount(userRegisterDto);
   }
 
+  forgotPw(email: string) {
+    console.info(email);
+    //
+  }
+
   // tool
   validateJwt(token: string) {
     return this.jwtService.verify(token);
@@ -150,12 +158,12 @@ export class AuthService {
       userId: newUser.id,
     });
 
-    return new LoginPayloadDto(new UserDto(newUser), token);
+    return new LoginPayloadDto(new UserDto(newUser, newAccount.uuid), token);
   }
 
   async handlerWithGoogle(socialInterface: ISocialInterface) {
     const { email = '', firstName = '', lastName = '' } = socialInterface;
-    const user = await this.accountsRepository.findOne({
+    const account = await this.accountsRepository.findOne({
       where: {
         userName: socialInterface.email,
       },
@@ -164,14 +172,17 @@ export class AuthService {
       },
     });
 
-    if (user) {
+    if (account) {
       const token = await this.createAccessToken({
-        userName: user.userName,
-        uuid: user.uuid,
-        userId: user.users[0].id,
+        userName: account.userName,
+        uuid: account.uuid,
+        userId: account.users[0].id,
       });
 
-      return new LoginPayloadDto(new UserDto(user.users[0]), token);
+      return new LoginPayloadDto(
+        new UserDto(account.users[0], account.uuid),
+        token,
+      );
     }
 
     return this.createAccount({

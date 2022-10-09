@@ -9,7 +9,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PageOptionsDto } from 'common/dto/page-options.dto';
 import { ApiPageOkResponse, GetSession } from 'decorators';
 import { Session } from 'interfaces/request';
@@ -18,6 +18,7 @@ import { CommentDto, CommentIdDto, CreateCommentDto } from './dtos/comment.dto';
 
 @Controller('private/comments')
 @ApiTags('Comments Api')
+@ApiBearerAuth()
 export class CommentController {
   constructor(private commentService: CommentService) {}
 

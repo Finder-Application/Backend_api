@@ -21,6 +21,7 @@ export class AuthMiddleware implements NestMiddleware {
   use(req: RequestCustom, res: Response, next: NextFunction) {
     try {
       let decode: RequestCustom['session'];
+
       if (this.configService.isDevelopment) {
         decode = {
           userName: 'taccin03@gmail.com',
@@ -36,7 +37,6 @@ export class AuthMiddleware implements NestMiddleware {
             'Signature verification raised: Authorization header is missing or malformed',
           );
         }
-
         decode = this.authService.validateJwt(authHeader);
       }
       req.session = {

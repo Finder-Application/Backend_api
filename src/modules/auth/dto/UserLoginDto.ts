@@ -11,3 +11,10 @@ export class UserLoginDto {
   @ApiProperty()
   readonly password: string;
 }
+
+export class UserForgotPwDto {
+    @IsString()
+    @IsEmail()
+    @ApiProperty()
+    readonly email: string;
+  }
