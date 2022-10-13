@@ -10,9 +10,9 @@ import { Comments } from "./Comments";
 import { Posts } from "./Posts";
 import { Users } from "./Users";
 
-@Index("fk_c_post_id_idx", ["postId"], {})
 @Index("fk_c_notification_comment_id_idx", ["commentId"], {})
 @Index("fk_c_user_id_idx", ["userId"], {})
+@Index("fk_c_notification_post_id_idx", ["postId"], {})
 @Entity("comment_notifications", { schema: "capstone_prod" })
 export class CommentNotifications {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })

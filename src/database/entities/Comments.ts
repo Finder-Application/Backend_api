@@ -13,7 +13,7 @@ import { SubComments } from "./SubComments";
 import { Users } from "./Users";
 
 @Index("fk_comment_profile_id_idx", ["userId"], {})
-@Index("fb_comment_post_id_idx", ["postId"], {})
+@Index("fk_comment_post_id_idx", ["postId"], {})
 @Entity("comments", { schema: "capstone_prod" })
 export class Comments {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
@@ -48,8 +48,8 @@ export class Comments {
   post: Posts;
 
   @ManyToOne(() => Users, (users) => users.comments, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
   user: Users;

@@ -46,11 +46,11 @@ export class PostDto {
     this.id = post.id;
     this.firstName = post.firstName;
     this.latsName = post.latsName;
-    this.dateOfBirth = post.dateOfBirth;
+    this.dateOfBirth = post.dateOfBirth?.toString() || null;
     this.gender = post.gender;
     this.lostAddress = post.lostAddress;
     this.hometown = post.hometown;
-    this.lostTime = post.lostTime;
+    this.lostTime = post.lostTime?.toString() || null;
     this.relationship = post.relationship;
     this.photos = post.photos;
     this.relevantPosts = post.relevantPosts;

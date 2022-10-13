@@ -57,7 +57,6 @@ export class SubCommentDto {
   constructor(comment: SubComments) {
     this.id = comment.id;
     this.repFor = comment.subFor;
-    this.postId = comment.postId;
     this.photo = comment.photo;
     this.content = comment.content;
     this.likes = comment.likes;

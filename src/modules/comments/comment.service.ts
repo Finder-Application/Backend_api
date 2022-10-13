@@ -23,7 +23,6 @@ export class CommentService {
   async createComment(createComment: CreateCommentDto, session: Session) {
     const comment = createComment.repFor
       ? this.subCommentsRepository.create({
-          postId: createComment.postId,
           content: createComment.content,
           photo: createComment.photo,
           userId: session.userId,

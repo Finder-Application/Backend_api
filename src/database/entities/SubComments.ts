@@ -7,12 +7,10 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Comments } from "./Comments";
-import { Posts } from "./Posts";
 import { Users } from "./Users";
 
 @Index("fk_sub_comment_id_idx", ["subFor"], {})
 @Index("fk_sub_comment_user_id_idx", ["userId"], {})
-@Index("fk_sub_comment_post_id_idx", ["postId"], {})
 @Entity("sub_comments", { schema: "capstone_prod" })
 export class SubComments {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
@@ -20,9 +18,6 @@ export class SubComments {
 
   @Column("int", { name: "sub_for" })
   subFor: number;
-
-  @Column("int", { name: "post_id" })
-  postId: number;
 
   @Column("int", { name: "user_id" })
   userId: number;
@@ -42,13 +37,6 @@ export class SubComments {
   })
   @JoinColumn([{ name: "sub_for", referencedColumnName: "id" }])
   subFor2: Comments;
-
-  @ManyToOne(() => Posts, (posts) => posts.subComments, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  })
-  @JoinColumn([{ name: "post_id", referencedColumnName: "id" }])
-  post: Posts;
 
   @ManyToOne(() => Users, (users) => users.subComments, {
     onDelete: "CASCADE",

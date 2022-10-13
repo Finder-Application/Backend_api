@@ -5,18 +5,18 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { CommentNotifications } from "./CommentNotifications";
 import { Comments } from "./Comments";
 import { PostNotifications } from "./PostNotifications";
 import { RelevantNetworkPosts } from "./RelevantNetworkPosts";
-import { SubComments } from "./SubComments";
 import { Users } from "./Users";
 
 @Index("fk_posts_profile_id_idx", ["userId"], {})
 @Entity("posts", { schema: "capstone_prod" })
 export class Posts {
-  @Column("int", { primary: true, name: "id" })
+  @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
   @Column("int", { name: "user_id" })
@@ -28,8 +28,8 @@ export class Posts {
   @Column("varchar", { name: "lats_name", length: 45 })
   latsName: string;
 
-  @Column("time", { name: "date_of_birth", nullable: true })
-  dateOfBirth: string | null;
+  @Column("datetime", { name: "date_of_birth", nullable: true })
+  dateOfBirth: Date | null;
 
   @Column("tinyint", { name: "gender", nullable: true, width: 1 })
   gender: boolean | null;
@@ -40,8 +40,8 @@ export class Posts {
   @Column("varchar", { name: "hometown", nullable: true, length: 200 })
   hometown: string | null;
 
-  @Column("time", { name: "lost_time", nullable: true })
-  lostTime: string | null;
+  @Column("datetime", { name: "lost_time", nullable: true })
+  lostTime: Date | null;
 
   @Column("varchar", { name: "relationship", nullable: true, length: 45 })
   relationship: string | null;
@@ -82,7 +82,4 @@ export class Posts {
     (relevantNetworkPosts) => relevantNetworkPosts.post
   )
   relevantNetworkPosts: RelevantNetworkPosts[];
-
-  @OneToMany(() => SubComments, (subComments) => subComments.post)
-  subComments: SubComments[];
 }

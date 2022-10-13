@@ -17,7 +17,7 @@ import { Repository } from 'typeorm';
 import { ApiConfigService } from '../../shared/services/api-config.service';
 import { AuthGoogleLoginDto, LoginPayloadDto } from './dto/LoginPayloadDto';
 import { TokenPayloadDto } from './dto/TokenPayloadDto';
-import { UserLoginDto } from './dto/UserLoginDto';
+import { UserChangePwDto, UserLoginDto } from './dto/UserLoginDto';
 import { UserRegisterDto } from './dto/UserRegisterDto';
 
 @Injectable()
@@ -120,6 +120,15 @@ export class AuthService {
 
   forgotPw(email: string) {
     console.info(email);
+
+    return email;
+
+    //
+  }
+
+  changePw(changePw: UserChangePwDto) {
+    console.info(changePw);
+    return changePw;
     //
   }
 

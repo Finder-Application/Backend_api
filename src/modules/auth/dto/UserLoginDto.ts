@@ -13,8 +13,23 @@ export class UserLoginDto {
 }
 
 export class UserForgotPwDto {
-    @IsString()
-    @IsEmail()
-    @ApiProperty()
-    readonly email: string;
-  }
+  @IsString()
+  @IsEmail()
+  @ApiProperty()
+  readonly email: string;
+}
+
+export class UserChangePwDto {
+  @IsString()
+  @IsEmail()
+  @ApiProperty()
+  readonly email: string;
+
+  @IsString()
+  @ApiProperty()
+  readonly secret: string;
+
+  @IsString()
+  @ApiProperty()
+  readonly password: string;
+}

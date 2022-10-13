@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-
 import { PageDto } from 'common/dto/page.dto';
 import { Posts } from 'database/entities/Posts';
+import { Repository } from 'typeorm';
 import { ValidatorService } from '../../shared/services/validator.service';
+import { CreatePostDto } from './dtos/create-post.dto';
 import { PostPageOptionsDto } from './dtos/post-page-options.dto';
 import { PostDto } from './dtos/post.dto';
 import type { UpdatePostDto } from './dtos/update-post.dto';
@@ -29,11 +29,17 @@ export class PostService {
 
   async getPostsPagination(
     pageOptionsDto: PostPageOptionsDto,
+    userId?: number,
   ): Promise<PageDto<PostDto>> {
     try {
       const queryBuilder = this.postRepository
         .createQueryBuilder('posts')
-        .leftJoinAndSelect('posts.user', 'user');
+        .leftJoinAndSelect('posts.user', 'user')
+        .leftJoinAndSelect('user.account', 'account');
+
+      if (userId) {
+        queryBuilder.where('posts.userId = :userId', { userId });
+      }
 
       const [items, pageMetaDto] = await queryBuilder.paginate(
         pageOptionsDto,
@@ -50,7 +56,38 @@ export class PostService {
     const queryBuilder = this.postRepository
       .createQueryBuilder('posts')
       .where('posts.id = :id', { id })
-      .leftJoinAndSelect('posts.user', 'user');
+      .leftJoinAndSelect('posts.user', 'user')
+      .leftJoinAndSelect('user.account', 'account');
+
+    const postEntity = await queryBuilder.getOne();
+
+    if (!postEntity) {
+      throw new PostNotFoundException();
+    }
+
+    return new PostDto(postEntity);
+  }
+
+  async createSinglePost(
+    createPost: CreatePostDto,
+    userId: number,
+  ): Promise<PostDto> {
+    const post = this.postRepository.create({
+      ...createPost,
+      userId,
+    });
+
+    const postCreate = await this.postRepository.save(post);
+
+    if (!postCreate.id) {
+      throw new PostNotFoundException();
+    }
+
+    const queryBuilder = this.postRepository
+      .createQueryBuilder('posts')
+      .where('posts.id = :id', { id: postCreate.id })
+      .leftJoinAndSelect('posts.user', 'user')
+      .leftJoinAndSelect('user.account', 'account');
 
     const postEntity = await queryBuilder.getOne();
 

@@ -1,12 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { IsEnum, IsString, validate, ValidationError } from 'class-validator';
-import { Order } from '../../constants';
-import {
-  EnumFieldOptional,
-  NumberFieldOptional,
-  StringFieldOptional,
-} from '../../decorators';
+import { NumberFieldOptional, StringFieldOptional } from '../../decorators';
 
 export enum EFilter {
   IsNull = 'ISNULL',
@@ -65,10 +60,10 @@ export const validateFilter = async (value: string) => {
   }
 };
 export class PageOptionsDto {
-  @EnumFieldOptional(() => Order, {
-    default: Order.ASC,
-  })
-  readonly order: Order = Order.ASC;
+  //   @EnumFieldOptional(() => Order, {
+  //     default: Order.ASC,
+  //   })
+  //   readonly order: Order = Order.ASC;
 
   @NumberFieldOptional({
     minimum: 1,
@@ -89,8 +84,11 @@ export class PageOptionsDto {
     return (this.page - 1) * this.take;
   }
 
+  //   @StringFieldOptional()
+  //   readonly q?: string;
+
   @StringFieldOptional()
-  readonly q?: string;
+  readonly order?: string;
 
   @StringFieldOptional()
   readonly filter?: string;

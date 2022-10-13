@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { Posts } from "./Posts";
 
-@Index("fk_relevant_network_posts_post_id_idx", ["postId"], {})
+@Index("fk_rnp_post_id_idx", ["postId"], {})
 @Entity("relevant_network_posts", { schema: "capstone_prod" })
 export class RelevantNetworkPosts {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
