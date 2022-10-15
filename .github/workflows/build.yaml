@@ -46,5 +46,3 @@ jobs:
             ls
             docker ps
             docker compose up --build backend-api -d
-            docker image prune -a
-            y
