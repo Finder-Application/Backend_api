@@ -3,6 +3,8 @@ import { Global, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 // import { ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { MailModule } from 'modules/mail/mail.module';
+import { MailService } from 'modules/mail/mail.service';
 import { ApiConfigService } from './services/api-config.service';
 import { GeneratorService } from './services/generator.service';
 import { ValidatorService } from './services/validator.service';
@@ -11,6 +13,7 @@ const providers = [
   ApiConfigService,
   ValidatorService,
   GeneratorService,
+  MailService,
   // {
   //   provide: 'NATS_SERVICE',
   //   useFactory: (configService: ApiConfigService) => {
@@ -30,7 +33,21 @@ const providers = [
 @Global()
 @Module({
   providers,
-  imports: [HttpModule, CqrsModule],
+  imports: [
+    HttpModule,
+    CqrsModule,
+    MailModule,
+    // MailerModule.forRootAsync({
+    //   imports: [SharedModule],
+    //   useFactory: (configService: ApiConfigService) => ({
+    //     transport: configService.mailConfig,
+    //     defaults: {
+    //       from: `"Finder" <${process.env.MAIL_USER || ''}>`,
+    //     },
+    //   }),
+    //   inject: [ApiConfigService],
+    // }),
+  ],
   exports: [...providers, HttpModule, CqrsModule],
 })
 export class SharedModule {}

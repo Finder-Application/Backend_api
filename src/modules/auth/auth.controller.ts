@@ -8,6 +8,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { AuthService } from './auth.service';
 
 import { AuthGoogleLoginDto, LoginPayloadDto } from './dto/LoginPayloadDto';
@@ -62,47 +63,22 @@ export class AuthController {
   @Get('forgot-pw')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
-    type: LoginPayloadDto,
-    description: 'User info with access token',
+    type: ResponseSuccessDto,
+    description: 'Send mail otp for user',
   })
-  userForgotPw(@Query() forgotPw: UserForgotPwDto) {
+  userForgotPw(
+    @Query() forgotPw: UserForgotPwDto,
+  ): Promise<ResponseSuccessDto> {
     return this.authService.forgotPw(forgotPw.email);
   }
 
-  @Get('change-pw')
+  @Post('change-pw')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: LoginPayloadDto,
     description: 'User info with access token',
   })
-  userChangePw(@Query() changePw: UserChangePwDto) {
+  userChangePw(@Body() changePw: UserChangePwDto): Promise<LoginPayloadDto> {
     return this.authService.changePw(changePw);
   }
-
-  //   @Post('register')
-  //   @HttpCode(HttpStatus.OK)
-  //   @ApiOkResponse({ type: UserDto, description: 'Successfully Registered' })
-  //   @ApiFile({ name: 'avatar' })
-  //   async userRegister(
-  //     @Body() userRegisterDto: UserRegisterDto,
-  //     @UploadedFile() file?: IFile,
-  //   ): Promise<UserDto> {
-  //     const createdUser = await this.userService.createUser(
-  //       userRegisterDto,
-  //       file,
-  //     );
-
-  //     return createdUser.toDto({
-  //       isActive: true,
-  //     });
-  //   }
-
-  //   @Version('1')
-  //   @Get('me')
-  //   @HttpCode(HttpStatus.OK)
-  //   @Auth([RoleType.USER, RoleType.ADMIN])
-  //   @ApiOkResponse({ type: UserDto, description: 'current user info' })
-  //   getCurrentUser(@AuthUser() user: UserEntity): UserDto {
-  //     return user.toDto();
-  //   }
 }

@@ -1,14 +1,18 @@
+import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Accounts } from 'database/entities/Accounts';
 import { Users } from 'database/entities/Users';
 import { OAuth2Client } from 'google-auth-library';
 import { ISocialInterface } from 'interfaces/social.interface';
+import { MailService } from 'modules/mail/mail.service';
 import { UserDto } from 'modules/user/dtos/user.dto';
 import { GeneratorService } from 'shared/services/generator.service';
 import { ValidatorService } from 'shared/services/validator.service';
@@ -33,6 +37,8 @@ export class AuthService {
     private usersRepository: Repository<Users>,
     private generator: GeneratorService,
     private validator: ValidatorService,
+    @InjectRedis() private readonly redis: Redis,
+    private mailService: MailService,
   ) {
     this.google = new OAuth2Client(
       this.configService.configGoogle.clientId,
@@ -118,18 +124,79 @@ export class AuthService {
     return this.createAccount(userRegisterDto);
   }
 
-  forgotPw(email: string) {
-    console.info(email);
+  async forgotPw(email: string): Promise<ResponseSuccessDto> {
+    const account = await this.accountsRepository.findOne({
+      where: {
+        userName: email,
+      },
+    });
 
-    return email;
+    if (!account) {
+      throw new BadRequestException('Your email is not exited');
+    }
+    const key = `otp:${email}`;
 
-    //
+    const ttlOfKey = await this.redis.ttl(key);
+    if (ttlOfKey > 0) {
+      throw new BadRequestException(
+        `Please wait ${ttlOfKey} seconds to resend otp`,
+      );
+    }
+
+    const otpCode = this.generator.genOtp();
+
+    await Promise.all([
+      this.redis.set(key, otpCode, 'EX', 60 * 3),
+      this.mailService.sendCodeOtp(email, otpCode),
+    ]);
+
+    return new ResponseSuccessDto(
+      'Send otp success . Please check your email to get otp code',
+    );
   }
 
-  changePw(changePw: UserChangePwDto) {
-    console.info(changePw);
-    return changePw;
-    //
+  async changePw(changePw: UserChangePwDto) {
+    const { email, otp, password } = changePw;
+
+    const key = `otp:${email}`;
+    const getOtp = await this.redis.get(key);
+
+    if (getOtp !== otp.toString()) {
+      throw new BadRequestException('Your otp code is invalid');
+    }
+
+    await this.accountsRepository
+      .createQueryBuilder()
+      .update(Accounts)
+      .set({ password: this.validator.encryptionPassword(password) })
+      .where('userName = :email', { email })
+      .execute();
+
+    const [account] = await Promise.all([
+      this.accountsRepository.findOne({
+        where: {
+          userName: email,
+        },
+        relations: {
+          users: true,
+        },
+      }),
+      this.redis.del(key),
+    ]);
+
+    if (account) {
+      const token = await this.createAccessToken({
+        userName: account.userName,
+        uuid: account.uuid,
+        userId: account.users[0].id,
+      });
+
+      return new LoginPayloadDto(
+        new UserDto(account.users[0], account.uuid),
+        token,
+      );
+    }
+    throw new InternalServerErrorException('Change password failed');
   }
 
   // tool

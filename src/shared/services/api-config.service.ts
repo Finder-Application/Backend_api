@@ -71,6 +71,29 @@ export class ApiConfigService {
     };
   }
 
+  get redisConfig(): string {
+    const host = this.getString('REDIS_HOST');
+    const port = this.getNumber('REDIS_PORT');
+    const user = this.getString('REDIS_USER');
+    const password = this.getString('REDIS_PW');
+    const db = this.getNumber('REDIS_DB');
+
+    return `redis://${user}:${password}@${host}:${port}?db=${db}`;
+  }
+
+  get mailConfig(): {
+    apiKey: string;
+    domain: string;
+  } {
+    const apiKey = this.getString('MAIL_API_KEY');
+    const domain = this.getString('MAIL_DOMAIN');
+
+    return {
+      apiKey,
+      domain,
+    };
+  }
+
   get configHashPassword(): string {
     return this.getString('HASH_PASSWORD');
   }

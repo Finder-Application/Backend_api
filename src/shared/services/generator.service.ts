@@ -18,4 +18,9 @@ export class GeneratorService {
       numbers: true,
     });
   }
+
+  public genOtp(): string {
+    // eslint-disable-next-line unicorn/numeric-separators-style
+    return String(Math.floor(100000 + Math.random() * 900000));
+  }
 }
