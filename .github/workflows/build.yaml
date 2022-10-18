@@ -38,11 +38,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           sync: true
           script: |
-            cd build/  
-            cd Backend_api/
-            git remote set-url origin https://cin12211:${{ secrets.GIT_TOKEN }}@github.com/Finder-Application/Backend_api.git
-            git pull origin
-            cd ..
-            ls
-            docker ps
-            docker compose up --build backend-api -d
+            sh script/build-be.sh
