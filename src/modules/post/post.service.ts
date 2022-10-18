@@ -3,6 +3,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageDto } from 'common/dto/page.dto';
 import { Posts } from 'database/entities/Posts';
+import { FirebaseService } from 'modules/firebase/firebase.service';
+import { ApiConfigService } from 'shared/services/api-config.service';
 import { Repository } from 'typeorm';
 import { ValidatorService } from '../../shared/services/validator.service';
 import { CreatePostDto } from './dtos/create-post.dto';
@@ -10,7 +12,6 @@ import { PostPageOptionsDto } from './dtos/post-page-options.dto';
 import { PostDto } from './dtos/post.dto';
 import type { UpdatePostDto } from './dtos/update-post.dto';
 import { PostNotFoundException } from './exceptions/post-not-found.exception';
-
 @Injectable()
 export class PostService {
   constructor(
@@ -18,6 +19,8 @@ export class PostService {
     private postRepository: Repository<Posts>,
     private validatorService: ValidatorService,
     private commandBus: CommandBus,
+    private apiConfig: ApiConfigService,
+    private firebase: FirebaseService,
   ) {}
 
   //   @Transactional()
@@ -72,24 +75,29 @@ export class PostService {
     createPost: CreatePostDto,
     userId: number,
   ): Promise<PostDto> {
+    const { descriptors, ...postData } = createPost;
+
     const post = this.postRepository.create({
-      ...createPost,
+      ...postData,
       userId,
     });
 
-    const postCreate = await this.postRepository.save(post);
+    const postCreated = await this.postRepository.save(post);
 
-    if (!postCreate.id) {
+    if (!postCreated.id) {
       throw new PostNotFoundException();
     }
 
     const queryBuilder = this.postRepository
       .createQueryBuilder('posts')
-      .where('posts.id = :id', { id: postCreate.id })
+      .where('posts.id = :id', { id: postCreated.id })
       .leftJoinAndSelect('posts.user', 'user')
       .leftJoinAndSelect('user.account', 'account');
 
-    const postEntity = await queryBuilder.getOne();
+    const [postEntity] = await Promise.all([
+      queryBuilder.getOne(),
+      this.firebase.saveDescriptors(descriptors),
+    ]);
 
     if (!postEntity) {
       throw new PostNotFoundException();
