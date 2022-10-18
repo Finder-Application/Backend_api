@@ -8,6 +8,7 @@ import { CommentModule } from 'modules/comments/comments.module';
 import { NotificationModule } from 'modules/notifications/notifications.module';
 import { PostModule } from 'modules/post/post.module';
 import { UserModule } from 'modules/user/user.module';
+import { UtilModule } from 'modules/utils/util.module';
 import { SharedModule } from 'shared/shared.module';
 import './boilerplate.polyfill';
 import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
@@ -40,6 +41,7 @@ import { ApiConfigService } from './shared/services/api-config.service';
     UserModule,
     CommentModule,
     PostModule,
+    UtilModule,
   ],
   providers: [],
 })
