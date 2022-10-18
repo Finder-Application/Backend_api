@@ -47,10 +47,7 @@ module.exports = {
      * plugin:typescript-eslint
      */
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      { argsIgnorePattern: '^_', vars: 'all', args: 'after-used' },
-    ],
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', vars: 'all', args: 'after-used' }],
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
     '@typescript-eslint/ban-types': [
@@ -61,8 +58,7 @@ module.exports = {
             message: 'Avoid using the `Object` type. Did you mean `object`?',
           },
           Function: {
-            message:
-              'Avoid using the `Function` type. Prefer a specific function type, like `() => void`.',
+            message: 'Avoid using the `Function` type. Prefer a specific function type, like `() => void`.',
           },
           Boolean: {
             message: 'Avoid using the `Boolean` type. Did you mean `boolean`?',
@@ -156,7 +152,7 @@ module.exports = {
     ],
     '@typescript-eslint/semi': ['error', 'always'],
     '@typescript-eslint/naming-convention': [
-      'error',
+      'off',
       {
         selector: 'default',
         format: ['camelCase', 'PascalCase', 'snake_case', 'UPPER_CASE'],

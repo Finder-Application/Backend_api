@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsDateString, IsOptional, IsString } from 'class-validator';
+import { Descriptor } from './face-descriptor.dto';
 
 export class CreatePostDto {
   @ApiProperty()
@@ -51,4 +52,18 @@ export class CreatePostDto {
   @IsOptional()
   @IsString()
   relevantPosts?: string;
+
+  @IsOptional()
+  @ApiProperty({
+    example: [
+      {
+        id: 'xxxx',
+        descriptor: 'Descriptor',
+      },
+    ],
+  })
+  descriptors?: Array<{
+    descriptor: Descriptor;
+    id: string;
+  }>;
 }

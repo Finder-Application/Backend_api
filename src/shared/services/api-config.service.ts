@@ -134,9 +134,20 @@ export class ApiConfigService {
     };
   }
 
+  get apiUrlFaceApi(): string {
+    return this.get('FACE_API_URL');
+  }
+
+  get firebaseConfig() {
+    return {
+      projectId: this.get('FIREBASE_PROJECT_ID'),
+      privateKey: this.get('FIREBASE_PRIVATE_KEY').replace(/\\n/g, '\n'),
+      clientEmail: this.get('FIREBASE_CLIENT_EMAIL'),
+    };
+  }
+
   private get(key: string): string {
     const value = this.configService.get<string>(key);
-
     if (isNil(value)) {
       throw new Error(key + ' environment variable does not set'); // probably we should call process.exit() too to avoid locking the service
     }
