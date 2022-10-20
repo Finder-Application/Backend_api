@@ -108,8 +108,8 @@ export class PostService {
 
   async updatePost(id: Uuid, updatePostDto: UpdatePostDto): Promise<void> {
     const queryBuilder = this.postRepository
-      .createQueryBuilder('post')
-      .where('post.id = :id', { id });
+      .createQueryBuilder('posts')
+      .where('posts.id = :id', { id });
 
     const postEntity = await queryBuilder.getOne();
 
@@ -124,8 +124,8 @@ export class PostService {
 
   async deletePost(id: Uuid): Promise<void> {
     const queryBuilder = this.postRepository
-      .createQueryBuilder('post')
-      .where('post.id = :id', { id });
+      .createQueryBuilder('posts')
+      .where('posts.id = :id', { id });
 
     const postEntity = await queryBuilder.getOne();
 

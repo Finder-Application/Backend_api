@@ -1,4 +1,6 @@
+/* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable @typescript-eslint/naming-convention,sonarjs/cognitive-complexity */
+import { BadRequestException } from '@nestjs/common';
 import 'source-map-support/register';
 
 import type { ObjectLiteral } from 'typeorm';
@@ -7,7 +9,11 @@ import { Brackets, QueryBuilder, SelectQueryBuilder } from 'typeorm';
 import type { AbstractEntity } from './common/abstract.entity';
 import type { AbstractDto } from './common/dto/abstract.dto';
 import { PageMetaDto } from './common/dto/page-meta.dto';
-import type { PageOptionsDto } from './common/dto/page-options.dto';
+import {
+  CFilter,
+  PageOptionsDto,
+  validateFilter,
+} from './common/dto/page-options.dto';
 import { PageDto } from './common/dto/page.dto';
 import type { KeyOfType } from './types';
 
@@ -15,7 +21,7 @@ declare global {
   export type Uuid = string & { _uuidBrand: undefined };
 
   interface Filter {
-    name: string;
+    field: string;
     operator: string;
     value: string;
   }
@@ -119,6 +125,35 @@ SelectQueryBuilder.prototype.paginate = async function (
 ) {
   if (!options?.takeAll) {
     this.skip(pageOptionsDto.skip).take(pageOptionsDto.take);
+  }
+
+  const { order, filter } = pageOptionsDto;
+
+  if (order) {
+    const field = order.split(':')[0];
+    const sortBy = order.split(':')[1].toUpperCase() as 'ASC' | 'DESC';
+    const nulls = String(order.split(':')[2])
+      .replace('_', ' ')
+      .toUpperCase() as 'NULLS FIRST' | 'NULLS LAST';
+    if (['ASC', 'DESC'].includes(sortBy)) {
+      if (['NULLS FIRST', 'NULLS LAST'].includes(nulls)) {
+        this.orderBy(`${field}`, sortBy, nulls);
+      }
+      this.orderBy(`${field}`, sortBy);
+    }
+  }
+
+  if (filter) {
+    const error = await validateFilter(filter);
+
+    if (error) {
+      throw new BadRequestException(error);
+    }
+    const newFilter = JSON.parse(filter) as CFilter[];
+
+    newFilter.forEach(e => {
+      this.andWhere(`${e.field} ${e.operator} (:value)`, { value: e.value });
+    });
   }
 
   const itemCount = await this.getCount();
