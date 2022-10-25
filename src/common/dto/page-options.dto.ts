@@ -94,12 +94,12 @@ export class PageOptionsDto {
     
     order?: string;
 
-    ## Example order : 'comments.content:ASC'
+    ## Example order : 'content:ASC'
     
     *Explanation:*
     | Name        | Description                                                                |
     | ----------- | ---------------------------------------------------------------------------|
-    | field       | 'comments.content' 'comments' is name of table '.content' field of table   |
+    | field       | 'content' -> 'content' field of table   |
     | operator    | ASC|DESC                                                                   |
 
     ------------------------
@@ -132,13 +132,13 @@ export class PageOptionsDto {
 
     filter?: string as Filter[];
 
-    ## Example filter : [{"field":"comments.content","operator":"LIKE","value":"cin"}]
+    ## Example filter : [{"field":"content","operator":"LIKE","value":"cin"}]
     (This example when in api get comments pagination , you can reused for the other api pagination , as long as your field correct with table of api)
     
     *Explanation:*
     | Name        | Description                                                                |
     | ----------- | ---------------------------------------------------------------------------|
-    | field       | 'comments.content' 'comments' is name of table '.content' field of table   |
+    | field       | 'content' 'content' field of table   |
     | operator    | is enum of Operator                                                        |
     | value       | Value you want filter                                                      |
 

@@ -57,6 +57,7 @@ export class CommentService {
       const [items, pageMetaDto] = await queryBuilder.paginate(
         pageOptionsDto,
         e => new CommentDto(e),
+        'comments',
       );
 
       return items.toPageDto<CommentDto>(pageMetaDto);

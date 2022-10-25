@@ -46,8 +46,8 @@ declare module 'typeorm' {
       this: SelectQueryBuilder<Entity>,
       pageOptionsDto: PageOptionsDto,
       mapDto?: (e: Entity) => unknown,
+      nameTable?: string,
       options?: Partial<{ takeAll: boolean }>,
-      filter?: Filter[],
     ): Promise<[Entity[], PageMetaDto]>;
 
     leftJoinAndSelect<AliasEntity extends AbstractEntity, A extends string>(
@@ -121,6 +121,7 @@ QueryBuilder.prototype.searchByString = function (q, columnNames) {
 SelectQueryBuilder.prototype.paginate = async function (
   pageOptionsDto: PageOptionsDto,
   mapDto: <T>(e) => T,
+  nameTable: string,
   options?: Partial<{ takeAll: boolean }>,
 ) {
   if (!options?.takeAll) {
@@ -137,9 +138,9 @@ SelectQueryBuilder.prototype.paginate = async function (
       .toUpperCase() as 'NULLS FIRST' | 'NULLS LAST';
     if (['ASC', 'DESC'].includes(sortBy)) {
       if (['NULLS FIRST', 'NULLS LAST'].includes(nulls)) {
-        this.orderBy(`${field}`, sortBy, nulls);
+        this.orderBy(`${nameTable}.${field}`, sortBy, nulls);
       }
-      this.orderBy(`${field}`, sortBy);
+      this.orderBy(`${nameTable}.${field}`, sortBy);
     }
   }
 
@@ -152,7 +153,9 @@ SelectQueryBuilder.prototype.paginate = async function (
     const newFilter = JSON.parse(filter) as CFilter[];
 
     newFilter.forEach(e => {
-      this.andWhere(`${e.field} ${e.operator} (:value)`, { value: e.value });
+      this.andWhere(`${nameTable}.${e.field} ${e.operator} (:value)`, {
+        value: e.value,
+      });
     });
   }
 
