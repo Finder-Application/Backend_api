@@ -1,60 +1,31 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Posts } from 'database/entities/Posts';
 import { UserPublicDto } from 'modules/user/dtos/user.dto';
 
-export class PostDto {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  firstName: string;
-
-  @ApiProperty()
-  latsName: string;
-
-  @ApiPropertyOptional({ type: Date })
-  dateOfBirth: string | null;
-
-  @ApiPropertyOptional()
-  gender: boolean | null;
-
-  @ApiPropertyOptional()
-  lostAddress: string | null;
-
-  @ApiPropertyOptional()
-  hometown: string | null;
-
-  @ApiPropertyOptional({ type: Date })
-  lostTime: string | null;
-
-  @ApiPropertyOptional()
-  relationship: string | null;
-
-  @ApiPropertyOptional()
-  photos: string | null;
-
-  @ApiPropertyOptional()
-  relevantPosts: string | null;
-
-  @ApiPropertyOptional()
-  shareCount: number | null;
-
-  @ApiProperty({ type: UserPublicDto })
-  user: UserPublicDto;
-
+export class PostConvertToResDto extends Posts {
+  private owner: UserPublicDto;
+  private hometown: Record<string, string | null> = {};
+  private missingAddress: Record<string, string | null> = {};
   constructor(post: Posts) {
-    this.id = post.id;
-    this.firstName = post.firstName;
-    this.latsName = post.latsName;
-    this.dateOfBirth = post.dateOfBirth?.toString() || null;
-    this.gender = post.gender;
-    this.lostAddress = post.lostAddress;
-    this.hometown = post.hometown;
-    this.lostTime = post.lostTime?.toString() || null;
-    this.relationship = post.relationship;
-    this.photos = post.photos;
-    this.relevantPosts = post.relevantPosts;
-    this.shareCount = post.shareCount;
-    this.user = new UserPublicDto(post.user);
+    super();
+    for (const key of Object.keys(post)) {
+      if (
+        key !== 'user' &&
+        !key.includes('hometown') &&
+        !key.includes('missing')
+      ) {
+        this[key] = post[key];
+      }
+    }
+    this.hometown.commune = post.hometownCommune;
+    this.hometown.hamlet = post.hometownHamlet;
+    this.hometown.region = post.hometownRegion;
+    this.hometown.state = post.hometownState;
+    this.missingAddress.commune = post.missingCommune;
+    this.missingAddress.hamlet = post.missingHamlet;
+    this.missingAddress.region = post.missingRegion;
+    this.missingAddress.state = post.missingState;
+    this.missingTime = post.missingTime;
+    this.photos = post.photos?.split(',') as unknown as string;
+    this.owner = new UserPublicDto(post.user);
   }
 }

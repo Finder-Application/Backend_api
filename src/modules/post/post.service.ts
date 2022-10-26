@@ -8,8 +8,9 @@ import { ApiConfigService } from 'shared/services/api-config.service';
 import { Repository } from 'typeorm';
 import { ValidatorService } from '../../shared/services/validator.service';
 import { CreatePostDto } from './dtos/create-post.dto';
+import { PostConvertToDBDto } from './dtos/post-convert.dto';
 import { PostPageOptionsDto } from './dtos/post-page-options.dto';
-import { PostDto } from './dtos/post.dto';
+import { PostConvertToResDto } from './dtos/post.dto';
 import type { UpdatePostDto } from './dtos/update-post.dto';
 import { PostNotFoundException } from './exceptions/post-not-found.exception';
 @Injectable()
@@ -33,7 +34,7 @@ export class PostService {
   async getPostsPagination(
     pageOptionsDto: PostPageOptionsDto,
     userId?: number,
-  ): Promise<PageDto<PostDto>> {
+  ): Promise<PageDto<PostConvertToResDto>> {
     try {
       const queryBuilder = this.postRepository
         .createQueryBuilder('posts')
@@ -46,16 +47,16 @@ export class PostService {
 
       const [items, pageMetaDto] = await queryBuilder.paginate(
         pageOptionsDto,
-        e => new PostDto(e),
+        e => new PostConvertToResDto(e),
       );
 
-      return items.toPageDto<PostDto>(pageMetaDto);
+      return items.toPageDto<PostConvertToResDto>(pageMetaDto);
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
-  async getSinglePost(id: Uuid): Promise<PostDto> {
+  async getSinglePost(id: Uuid): Promise<PostConvertToResDto> {
     const queryBuilder = this.postRepository
       .createQueryBuilder('posts')
       .where('posts.id = :id', { id })
@@ -68,22 +69,21 @@ export class PostService {
       throw new PostNotFoundException();
     }
 
-    return new PostDto(postEntity);
+    return new PostConvertToResDto(postEntity);
   }
 
   async createSinglePost(
     createPost: CreatePostDto,
     userId: number,
-  ): Promise<PostDto> {
+  ): Promise<PostConvertToResDto> {
     const { descriptors, ...postData } = createPost;
 
     const post = this.postRepository.create({
-      ...postData,
+      ...new PostConvertToDBDto(postData),
       userId,
-    });
+    }) ;
 
     const postCreated = await this.postRepository.save(post);
-
     if (!postCreated.id) {
       throw new PostNotFoundException();
     }
@@ -103,7 +103,7 @@ export class PostService {
       throw new PostNotFoundException();
     }
 
-    return new PostDto(postEntity);
+    return new PostConvertToResDto(postEntity);
   }
 
   async updatePost(id: Uuid, updatePostDto: UpdatePostDto): Promise<void> {

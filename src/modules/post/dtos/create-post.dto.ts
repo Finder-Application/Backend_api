@@ -1,17 +1,29 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsDateString, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Descriptor } from './face-descriptor.dto';
+export class Address {
+  region: string | null;
+  state: string | null;
+  commune: string | null;
+  hamlet: string | null;
+}
 
 export class CreatePostDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  firstName: string;
+  title: string;
 
   @ApiProperty()
   @IsOptional()
   @IsString()
-  latsName: string;
+  fullName: string;
 
   @ApiPropertyOptional({ type: Date })
   @IsOptional()
@@ -21,37 +33,29 @@ export class CreatePostDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  gender?: boolean;
+  gender: boolean | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: Address })
   @IsOptional()
-  @IsString()
-  lostAddress?: string;
+  hometown?: Address;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: Address })
   @IsOptional()
-  @IsString()
-  hometown?: string;
+  missingAddress?: Address;
 
   @ApiPropertyOptional({ type: Date })
   @IsOptional()
-  @IsDateString()
-  lostTime?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
   @IsString()
-  relationship?: string;
+  missingTime?: Date | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: Array<string> })
   @IsOptional()
-  @IsString()
-  photos?: string;
+  @IsArray()
+  photos?: string[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   @IsOptional()
-  @IsString()
-  relevantPosts?: string;
+  description: string | null;
 
   @IsOptional()
   @ApiProperty({
