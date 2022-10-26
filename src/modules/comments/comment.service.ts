@@ -46,10 +46,10 @@ export class CommentService {
   async getPagination(pageOptionsDto: PageOptionsDto, postId: number) {
     try {
       const queryBuilder = this.commentsRepository
-        .createQueryBuilder('comment')
-        .where('comment.postId = :postId', { postId })
-        .leftJoinAndSelect('comment.subComments', 'sub')
-        .leftJoinAndSelect('comment.user', 'user')
+        .createQueryBuilder('comments')
+        .where('comments.postId = :postId', { postId })
+        .leftJoinAndSelect('comments.subComments', 'sub')
+        .leftJoinAndSelect('comments.user', 'user')
         .leftJoinAndSelect('user.account', 'account')
         .leftJoinAndSelect('sub.user', 'userSub')
         .leftJoinAndSelect('userSub.account', 'accountSub');
@@ -57,6 +57,7 @@ export class CommentService {
       const [items, pageMetaDto] = await queryBuilder.paginate(
         pageOptionsDto,
         e => new CommentDto(e),
+        'comments',
       );
 
       return items.toPageDto<CommentDto>(pageMetaDto);

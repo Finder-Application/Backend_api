@@ -1,7 +1,18 @@
-import { BadRequestException } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 import { IsEnum, IsString, validate, ValidationError } from 'class-validator';
 import { NumberFieldOptional, StringFieldOptional } from '../../decorators';
+
+export enum Order {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+export class OrderDto {
+  @IsString()
+  field: string;
+  @IsEnum(Order)
+  value: Order;
+}
 
 export enum EFilter {
   IsNull = 'ISNULL',
@@ -17,7 +28,7 @@ export enum EFilter {
 
 export class CFilter implements Filter {
   @IsString()
-  name: string;
+  field: string;
   @IsEnum(EFilter)
   operator: string;
   @IsString()
@@ -26,15 +37,19 @@ export class CFilter implements Filter {
 
 export const validateFilter = async (value: string) => {
   if (!value) {
-    return [];
+    return null;
   }
 
   let newValue: CFilter[] = [];
 
   try {
     newValue = JSON.parse(value) as CFilter[];
+
+    if (!Array.isArray(newValue)) {
+      return 'Filter must be an array';
+    }
   } catch (error) {
-    throw new BadRequestException(error.message);
+    return error.message;
   }
 
   if (Array.isArray(newValue)) {
@@ -44,27 +59,19 @@ export const validateFilter = async (value: string) => {
     for (const e of filters) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises, no-await-in-loop
       const errors = await validate(e);
-
       if (errors.length > 0) {
         listErrors = [...listErrors, ...errors];
         break;
       }
     }
     if (listErrors.length > 0) {
-      throw new BadRequestException({
-        message: listErrors,
-      });
+      return listErrors;
     }
 
-    return filters;
+    return null;
   }
 };
 export class PageOptionsDto {
-  //   @EnumFieldOptional(() => Order, {
-  //     default: Order.ASC,
-  //   })
-  //   readonly order: Order = Order.ASC;
-
   @NumberFieldOptional({
     minimum: 1,
     default: 1,
@@ -80,16 +87,67 @@ export class PageOptionsDto {
   })
   readonly take: number = 10;
 
+  @StringFieldOptional()
+  @ApiProperty({
+    description: `
+    # How to use order
+    
+    order?: string;
+
+    ## Example order : 'content:ASC'
+    
+    *Explanation:*
+    | Name        | Description                                                                |
+    | ----------- | ---------------------------------------------------------------------------|
+    | field       | 'content' -> 'content' field of table   |
+    | operator    | ASC|DESC                                                                   |
+
+    ------------------------
+    `,
+  })
+  readonly order?: string;
+
+  @StringFieldOptional({})
+  @ApiProperty({
+    description: `
+    # How to use filter
+
+    enum Operator {
+        IsNull = 'ISNULL',
+        ILike = 'ILIKE',
+        Like = 'LIKE',
+        Equal = 'EQUAL',
+        MoreThanOrEqual = 'MORETHANOREQUAL',
+        MoreThan = 'MORETHAN',
+        LessThanOrEqual = 'LESSTHANOREQUAL',
+        LessThan = 'LESSTHAN',
+        Not = 'NOT',
+    }
+
+    class Filter {
+        field: string;
+        operator: Operator;
+        value: string;
+    }
+
+    filter?: string as Filter[];
+
+    ## Example filter : [{"field":"content","operator":"LIKE","value":"cin"}]
+    (This example when in api get comments pagination , you can reused for the other api pagination , as long as your field correct with table of api)
+    
+    *Explanation:*
+    | Name        | Description                                                                |
+    | ----------- | ---------------------------------------------------------------------------|
+    | field       | 'content' 'content' field of table   |
+    | operator    | is enum of Operator                                                        |
+    | value       | Value you want filter                                                      |
+
+    ------------------------
+    `,
+  })
+  readonly filter?: string;
+
   get skip(): number {
     return (this.page - 1) * this.take;
   }
-
-  //   @StringFieldOptional()
-  //   readonly q?: string;
-
-  @StringFieldOptional()
-  readonly order?: string;
-
-  @StringFieldOptional()
-  readonly filter?: string;
 }
