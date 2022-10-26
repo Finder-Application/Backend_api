@@ -19,7 +19,9 @@ export class FirebaseService implements OnModuleInit {
     descriptors?: CreatePostDto['descriptors'],
     post_id?: number,
   ) {
-    if (!descriptors?.length || !post_id) {return null;}
+    if (!descriptors?.length || !post_id) {
+      return null;
+    }
     return this.fireStore.collection('faces').add({
       post_id,
       descriptors,

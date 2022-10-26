@@ -34,6 +34,18 @@ export class Comments {
   @Column("int", { name: "likes", default: () => "'0'" })
   likes: number;
 
+  @Column("datetime", {
+    name: "created_at",
+    default: () => "CURRENT_TIMESTAMP",
+  })
+  createdAt: Date;
+
+  @Column("datetime", {
+    name: "updated_at",
+    default: () => "CURRENT_TIMESTAMP",
+  })
+  updatedAt: Date;
+
   @OneToMany(
     () => CommentNotifications,
     (commentNotifications) => commentNotifications.comment

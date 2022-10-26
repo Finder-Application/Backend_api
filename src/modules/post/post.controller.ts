@@ -18,7 +18,7 @@ import { Session } from 'interfaces/request';
 
 import { ApiPageOkResponse, Auth, GetSession } from '../../decorators';
 import { CreatePostDto } from './dtos/create-post.dto';
-import { PostDto } from './dtos/post.dto';
+import { PostConvertToResDto } from './dtos/post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { PostService } from './post.service';
 
@@ -30,7 +30,7 @@ export class PostController {
   @Post()
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: PostDto })
+  @ApiOkResponse({ type: PostConvertToResDto })
   async createSinglePost(
     @Body() createPost: CreatePostDto,
     @GetSession() session: Session,
@@ -39,19 +39,19 @@ export class PostController {
   }
 
   @Get()
-  @ApiPageOkResponse({ type: PostDto })
+  @ApiPageOkResponse({ type: PostConvertToResDto })
   getPostsPagination(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: PageOptionsDto,
     @GetSession() session: Session,
-  ): Promise<PageDto<PostDto>> {
+  ): Promise<PageDto<PostConvertToResDto>> {
     return this.postService.getPostsPagination(pageOptionsDto, session.userId);
   }
 
   @Get(':id')
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: PostDto })
+  @ApiOkResponse({ type: PostConvertToResDto })
   async getSinglePost(@Param('id') id: Uuid) {
     return this.postService.getSinglePost(id);
   }
@@ -80,11 +80,11 @@ export class PostPublicController {
   constructor(private postService: PostService) {}
 
   @Get()
-  @ApiPageOkResponse({ type: PostDto })
+  @ApiPageOkResponse({ type: PostConvertToResDto })
   getPostsPagination(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: PageOptionsDto,
-  ): Promise<PageDto<PostDto>> {
+  ): Promise<PageDto<PostConvertToResDto>> {
     return this.postService.getPostsPagination(pageOptionsDto);
   }
 }
