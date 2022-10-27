@@ -20,12 +20,14 @@ export class UserPublicDto {
   @ApiPropertyOptional()
   uuid: string;
 
-  constructor(user: Users, uuid?: string) {
-    this.firstName = user.firstName;
-    this.lastName = user.lastName;
-    this.middleName = user.middleName || '';
-    this.avatar = user.avatar || '';
-    this.uuid = uuid ?? user.account.uuid;
+  constructor(user?: Users, uuid?: string) {
+    if (user) {
+      this.firstName = user.firstName;
+      this.lastName = user.lastName;
+      this.middleName = user.middleName || '';
+      this.avatar = user.avatar || '';
+      this.uuid = uuid ?? user.account?.uuid;
+    }
   }
 }
 

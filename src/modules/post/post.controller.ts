@@ -18,7 +18,7 @@ import { Session } from 'interfaces/request';
 
 import { ApiPageOkResponse, Auth, GetSession } from '../../decorators';
 import { CreatePostDto } from './dtos/create-post.dto';
-import { PostConvertToResDto } from './dtos/post.dto';
+import { PostConvertToResDto } from './dtos/post-res.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { PostService } from './post.service';
 

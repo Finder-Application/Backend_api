@@ -26,7 +26,10 @@ export class Posts {
   title: string | null;
 
   @Column('varchar', { name: 'full_name', length: 100 })
-  fullName: string;
+  fullName: string | null;
+
+  @Column('varchar', { name: 'nickname', length: 100 })
+  nickname: string | null;
 
   @Column('date', { name: 'date_of_birth', nullable: true })
   dateOfBirth: string | null;
@@ -59,7 +62,7 @@ export class Posts {
   missingHamlet: string | null;
 
   @Column('datetime', { name: 'missing_time', nullable: true })
-  missingTime: Date | null;
+  missingTime: string | null;
 
   @Column('varchar', { name: 'photos', nullable: true, length: 500 })
   photos: string | null;
