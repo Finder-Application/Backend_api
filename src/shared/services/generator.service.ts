@@ -20,6 +20,6 @@ export class GeneratorService {
   }
 
   public genOtp(random: () => number = Math.random): string {
-    return String(Math.floor(100000 + random() * 900000));
+    return String(Math.floor(100_000 + random() * 900_000));
   }
 }

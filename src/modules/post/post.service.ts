@@ -3,7 +3,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageDto } from 'common/dto/page.dto';
 import { Posts } from 'database/entities/Posts';
-import TABLES from 'database/entities/tables';
 import { FirebaseService } from 'modules/firebase/firebase.service';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { Repository } from 'typeorm';
@@ -13,7 +12,6 @@ import { CreatePostDto } from './dtos/create-post.dto';
 import { PostConvertToDBDto } from './dtos/post-convert.dto';
 import { PostPageOptionsDto } from './dtos/post-page-options.dto';
 import { PostConvertToResDto } from './dtos/post-res.dto';
-import { ResponseUpsertPostDto } from './dtos/res-upsert.dto';
 import type { UpdatePostDto } from './dtos/update-post.dto';
 import { PostExistedException } from './exceptions/post-existed.expection';
 import { PostNotFoundException } from './exceptions/post-not-found.exception';
@@ -134,11 +132,11 @@ export class PostService {
       throw new PostNotFoundException('Post Not Found');
     }
 
-    const oldPhotos = currentPost?.photos?.split(',') || [];
-    const { photos: newPhotos = [] } = data;
+    // const oldPhotos = currentPost.photos?.split(',') || [];
+    // const { photos: newPhotos = [] } = data;
 
     // ** Remove duplicate photos
-    const photos = new Set(oldPhotos.concat(newPhotos));
+    // const photos = new Set(oldPhotos.concat(newPhotos));
 
     const newData = this.postRepository.merge(currentPost, dataUpdate);
 

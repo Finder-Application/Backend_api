@@ -26,7 +26,7 @@ export class UserPublicDto {
       this.lastName = user.lastName;
       this.middleName = user.middleName || '';
       this.avatar = user.avatar || '';
-      this.uuid = uuid ?? user.account?.uuid;
+      this.uuid = uuid ?? user.account.uuid;
     }
   }
 }
