@@ -6,10 +6,10 @@ export type UserDtoOptions = Partial<{ isActive: boolean }>;
 
 export class UserPublicDto {
   @ApiProperty()
-  firstName: string;
+  firstName?: string;
 
   @ApiProperty()
-  lastName: string;
+  lastName?: string;
 
   @ApiPropertyOptional()
   middleName?: string;
@@ -18,15 +18,15 @@ export class UserPublicDto {
   avatar?: string;
 
   @ApiPropertyOptional()
-  uuid: string;
+  uuid?: string;
 
-  constructor(user?: Users, uuid?: string) {
+  constructor(user?: Partial<Users>, uuid?: string) {
     if (user) {
       this.firstName = user.firstName;
       this.lastName = user.lastName;
       this.middleName = user.middleName || '';
       this.avatar = user.avatar || '';
-      this.uuid = uuid ?? user.account.uuid;
+      this.uuid = uuid ?? user.account?.uuid;
     }
   }
 }
