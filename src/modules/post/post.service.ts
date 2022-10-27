@@ -132,10 +132,10 @@ export class PostService {
       throw new PostNotFoundException('Post Not Found');
     }
 
-    // const oldPhotos = currentPost.photos?.split(',') || [];
+    // const oldPhotos = currentPost?.photos?.split(',') || [];
     // const { photos: newPhotos = [] } = data;
 
-    // ** Remove duplicate photos
+    // // ** Remove duplicate photos
     // const photos = new Set(oldPhotos.concat(newPhotos));
 
     const newData = this.postRepository.merge(currentPost, dataUpdate);
