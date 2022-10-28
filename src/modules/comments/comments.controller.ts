@@ -22,17 +22,6 @@ import { CommentDto, CommentIdDto, CreateCommentDto } from './dtos/comment.dto';
 export class CommentController {
   constructor(private commentService: CommentService) {}
 
-  @Get()
-  @ApiPageOkResponse({ type: CommentDto })
-  @UsePipes(new ValidationPipe({ transform: true }))
-  getPostsPagination(
-    @Query() postId: CommentIdDto,
-    @Query(new ValidationPipe({ transform: true }))
-    pageOptionsDto: PageOptionsDto,
-  ): Promise<any> {
-    return this.commentService.getPagination(pageOptionsDto, postId.id);
-  }
-
   @Post()
   createOneComment(
     @Body() createComment: CreateCommentDto,
@@ -55,8 +44,16 @@ export class CommentController {
 @Controller('public/comments')
 @ApiTags('Public Comments Api')
 export class CommentPublicController {
+  constructor(private commentService: CommentService) {}
+
   @Get()
-  getPaginationComment() {
-    return 'getPaginationComment';
+  @ApiPageOkResponse({ type: CommentDto })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  getPostsPagination(
+    @Query() postId: CommentIdDto,
+    @Query(new ValidationPipe({ transform: true }))
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<any> {
+    return this.commentService.getPagination(pageOptionsDto, postId.id);
   }
 }
