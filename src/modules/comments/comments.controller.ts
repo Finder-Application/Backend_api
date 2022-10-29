@@ -9,8 +9,9 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PageOptionsDto } from 'common/dto/page-options.dto';
+import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { ApiPageOkResponse, GetSession } from 'decorators';
 import { Session } from 'interfaces/request';
 import { CommentService } from './comment.service';
@@ -36,6 +37,7 @@ export class CommentController {
   }
 
   @Delete(':id')
+  @ApiOkResponse({ type: ResponseSuccessDto })
   deleteComment(@Param('id') id: number) {
     return this.commentService.deleteComment(id);
   }

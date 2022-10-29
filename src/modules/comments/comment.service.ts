@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageOptionsDto } from 'common/dto/page-options.dto';
+import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Comments } from 'database/entities/Comments';
 import { SubComments } from 'database/entities/SubComments';
 import { Session } from 'interfaces/request';
@@ -97,5 +98,7 @@ export class CommentService {
     if (!findComment.affected) {
       throw new NotFoundException('Your comment not exit!!');
     }
+
+    return new ResponseSuccessDto('Delete comment success', { id });
   }
 }
