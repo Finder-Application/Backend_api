@@ -14,7 +14,6 @@ import {
 import { ApiAcceptedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PageOptionsDto } from 'common/dto/page-options.dto';
 
-import { PageDto } from 'common/dto/page.dto';
 import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Session } from 'interfaces/request';
 
