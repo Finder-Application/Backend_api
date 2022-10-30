@@ -25,8 +25,12 @@ export class Posts {
   @Column("varchar", { name: "title", nullable: true, length: 50 })
   title: string | null;
 
-  @Column("varchar", { name: "full_name", nullable: true, length: 100 })
+  @Column('varchar', { name: 'full_name', length: 100 })
   fullName: string | null;
+
+  @Column('varchar', { name: 'nickname', length: 100 })
+  nickname: string | null;
+
 
   @Column("varchar", { name: "nickname", nullable: true, length: 100 })
   nickname: string | null;
@@ -61,8 +65,12 @@ export class Posts {
   @Column("varchar", { name: "missing_hamlet", nullable: true, length: 100 })
   missingHamlet: string | null;
 
+  @Column('datetime', { name: 'missing_time', nullable: true })
+  missingTime: string | null;
+  
   @Column("varchar", { name: "missing_commune", nullable: true, length: 100 })
   missingCommune: string | null;
+
 
   @Column("datetime", { name: "missing_time" })
   missingTime: Date;

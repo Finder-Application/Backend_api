@@ -8,10 +8,22 @@ import {
 } from 'class-validator';
 import { Descriptor } from './face-descriptor.dto';
 export class Address {
-  region: string | null;
-  state: string | null;
-  commune: string | null;
-  hamlet: string | null;
+  region?: string;
+  state?: string;
+  commune?: string;
+  hamlet?: string;
+
+  constructor(
+    region?: string,
+    state?: string,
+    commune?: string,
+    hamlet?: string,
+  ) {
+    this.region = region;
+    this.state = state;
+    this.commune = commune;
+    this.hamlet = hamlet;
+  }
 }
 
 export class CreatePostDto {
@@ -25,6 +37,11 @@ export class CreatePostDto {
   @IsString()
   fullName: string;
 
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  nickname: string;
+
   @ApiPropertyOptional({ type: Date })
   @IsOptional()
   @IsDateString()
@@ -33,7 +50,7 @@ export class CreatePostDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  gender: boolean | null;
+  gender?: boolean;
 
   @ApiPropertyOptional({ type: Address })
   @IsOptional()
@@ -46,7 +63,7 @@ export class CreatePostDto {
   @ApiPropertyOptional({ type: Date })
   @IsOptional()
   @IsString()
-  missingTime?: Date | null;
+  missingTime?: string;
 
   @ApiPropertyOptional({ type: Array<string> })
   @IsOptional()
@@ -55,7 +72,7 @@ export class CreatePostDto {
 
   @ApiPropertyOptional({ type: String })
   @IsOptional()
-  description: string | null;
+  description: string;
 
   @IsOptional()
   @ApiProperty({

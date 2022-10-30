@@ -8,11 +8,13 @@ import { FirebaseService } from 'modules/firebase/firebase.service';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { Repository } from 'typeorm';
 import { ValidatorService } from '../../shared/services/validator.service';
+import { DateService } from './../../shared/services/Date.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { PostConvertToDBDto } from './dtos/post-convert.dto';
 import { PostPageOptionsDto } from './dtos/post-page-options.dto';
-import { PostConvertToResDto } from './dtos/post.dto';
+import { PostConvertToResDto } from './dtos/post-res.dto';
 import type { UpdatePostDto } from './dtos/update-post.dto';
+import { PostExistedException } from './exceptions/post-existed.expection';
 import { PostNotFoundException } from './exceptions/post-not-found.exception';
 @Injectable()
 export class PostService {
@@ -24,13 +26,6 @@ export class PostService {
     private apiConfig: ApiConfigService,
     private firebase: FirebaseService,
   ) {}
-
-  //   @Transactional()
-  //   createPost(userId: Uuid, createPostDto: CreatePostDto): Promise<PostEntity> {
-  //     return this.commandBus.execute<CreatePostCommand, PostEntity>(
-  //       new CreatePostCommand(userId, createPostDto),
-  //     );
-  //   }
 
   async getPostsPagination(
     pageOptionsDto: PostPageOptionsDto,
@@ -79,12 +74,33 @@ export class PostService {
   ): Promise<PostConvertToResDto> {
     const { descriptors, ...postData } = createPost;
 
-    const post = this.postRepository.create({
+    const isExistedPost = await this.postRepository.findOne({
+      where: {
+        fullName: postData.fullName,
+        dateOfBirth: DateService.getOnlyDate(postData.dateOfBirth),
+        gender: postData.gender,
+        missingRegion: postData.missingAddress?.region,
+        hometownRegion: postData.hometown?.region,
+        hometownCommune: postData.hometown?.commune,
+        hometownHamlet: postData.hometown?.commune,
+        hometownState: postData.hometown?.state,
+      },
+      relations: {
+        user: true,
+      },
+    });
+    if (isExistedPost) {
+      throw new PostExistedException(
+        new PostConvertToResDto(isExistedPost),
+        'Post information is existed',
+      );
+    }
+
+    const newPost = this.postRepository.create({
       ...new PostConvertToDBDto(postData),
       userId,
     });
-
-    const postCreated = await this.postRepository.save(post);
+    const postCreated = await this.postRepository.save(newPost);
     if (!postCreated.id) {
       throw new PostNotFoundException();
     }
@@ -103,24 +119,29 @@ export class PostService {
     if (!postEntity) {
       throw new PostNotFoundException();
     }
-
     return new PostConvertToResDto(postEntity);
   }
 
-  async updatePost(id: Uuid, updatePostDto: UpdatePostDto): Promise<void> {
-    const queryBuilder = this.postRepository
-      .createQueryBuilder('posts')
-      .where('posts.id = :id', { id });
-
-    const postEntity = await queryBuilder.getOne();
-
-    if (!postEntity) {
-      throw new PostNotFoundException();
+  async updatePost(id: Uuid, data: UpdatePostDto): Promise<void> {
+    const dataUpdate = new PostConvertToDBDto(data);
+    const currentPost = await this.postRepository.findOne({
+      where: {
+        id: id as unknown as number,
+      },
+    });
+    if (!currentPost) {
+      throw new PostNotFoundException('Post Not Found');
     }
 
-    this.postRepository.merge(postEntity, updatePostDto);
+    // const oldPhotos = currentPost?.photos?.split(',') || [];
+    // const { photos: newPhotos = [] } = data;
 
-    await this.postRepository.save(updatePostDto);
+    // // ** Remove duplicate photos
+    // const photos = new Set(oldPhotos.concat(newPhotos));
+
+    const newData = this.postRepository.merge(currentPost, dataUpdate);
+
+    await this.postRepository.save(newData);
   }
 
   async deletePost(id: Uuid): Promise<ResponseSuccessDto> {

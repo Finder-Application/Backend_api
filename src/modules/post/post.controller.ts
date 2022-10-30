@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiAcceptedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PageOptionsDto } from 'common/dto/page-options.dto';
+
 import { PageDto } from 'common/dto/page.dto';
 import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Session } from 'interfaces/request';
@@ -45,7 +46,7 @@ export class PostController {
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: PageOptionsDto,
     @GetSession() session: Session,
-  ): Promise<PageDto<PostConvertToResDto>> {
+  ) {
     return this.postService.getPostsPagination(pageOptionsDto, session.userId);
   }
 
@@ -84,7 +85,7 @@ export class PostPublicController {
   getPostsPagination(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: PageOptionsDto,
-  ): Promise<PageDto<PostConvertToResDto>> {
+  ) {
     return this.postService.getPostsPagination(pageOptionsDto);
   }
 }
