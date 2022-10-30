@@ -86,6 +86,12 @@ export class CommentDto {
   @ApiPropertyOptional({ type: () => [SubCommentDto] })
   child?: SubCommentDto[];
 
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+
   constructor(comment: Comments) {
     this.id = comment.id;
     this.postId = comment.postId;
@@ -96,5 +102,7 @@ export class CommentDto {
     this.child = comment.subComments.map(
       (e: SubComments) => new SubCommentDto(e),
     );
+    this.createdAt = comment.createdAt;
+    this.updatedAt = comment.updatedAt;
   }
 }
