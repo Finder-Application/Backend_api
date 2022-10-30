@@ -54,6 +54,12 @@ export class SubCommentDto {
   @ApiProperty({ type: () => UserPublicDto })
   user: UserPublicDto;
 
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+
   constructor(comment: SubComments) {
     this.id = comment.id;
     this.repFor = comment.subFor;
@@ -61,6 +67,8 @@ export class SubCommentDto {
     this.content = comment.content;
     this.likes = comment.likes;
     this.user = new UserPublicDto(comment.user);
+    this.createdAt = comment.createdAt;
+    this.updatedAt = comment.updatedAt;
   }
 }
 

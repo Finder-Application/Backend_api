@@ -53,8 +53,8 @@ export class Comments {
   commentNotifications: CommentNotifications[];
 
   @ManyToOne(() => Posts, (posts) => posts.comments, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "post_id", referencedColumnName: "id" }])
   post: Posts;
