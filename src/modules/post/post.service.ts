@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageDto } from 'common/dto/page.dto';
+import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Posts } from 'database/entities/Posts';
 import { FirebaseService } from 'modules/firebase/firebase.service';
 import { ApiConfigService } from 'shared/services/api-config.service';
@@ -143,7 +144,7 @@ export class PostService {
     await this.postRepository.save(newData);
   }
 
-  async deletePost(id: Uuid): Promise<void> {
+  async deletePost(id: Uuid): Promise<ResponseSuccessDto> {
     const queryBuilder = this.postRepository
       .createQueryBuilder('posts')
       .where('posts.id = :id', { id });
@@ -155,5 +156,7 @@ export class PostService {
     }
 
     await this.postRepository.remove(postEntity);
+
+    return new ResponseSuccessDto('Delete post success', { id });
   }
 }

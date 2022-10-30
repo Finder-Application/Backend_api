@@ -13,6 +13,8 @@ import {
 } from '@nestjs/common';
 import { ApiAcceptedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PageOptionsDto } from 'common/dto/page-options.dto';
+
+import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Session } from 'interfaces/request';
 
 import { ApiPageOkResponse, Auth, GetSession } from '../../decorators';
@@ -66,10 +68,9 @@ export class PostController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.ACCEPTED)
-  @ApiAcceptedResponse()
-  async deletePost(@Param('id') id: Uuid): Promise<void> {
-    await this.postService.deletePost(id);
+  @ApiAcceptedResponse({ type: ResponseSuccessDto })
+  async deletePost(@Param('id') id: Uuid): Promise<ResponseSuccessDto> {
+    return this.postService.deletePost(id);
   }
 }
 
@@ -79,7 +80,7 @@ export class PostPublicController {
   constructor(private postService: PostService) {}
 
   @Get()
-  @ApiPageOkResponse({ type: PostConvertToResDto })
+  @ApiOkResponse({ type: PostConvertToResDto })
   getPostsPagination(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: PageOptionsDto,
