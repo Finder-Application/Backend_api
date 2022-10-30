@@ -58,11 +58,11 @@ export class Posts {
   @Column('varchar', { name: 'missing_state', nullable: true, length: 100 })
   missingState: string | null;
 
-  @Column('varchar', { name: 'missing_commune:', nullable: true, length: 100 })
-  missingCommune: string | null;
-
   @Column('varchar', { name: 'missing_hamlet', nullable: true, length: 100 })
   missingHamlet: string | null;
+
+  @Column('varchar', { name: 'missing_commune', nullable: true, length: 100 })
+  missingCommune: string | null;
 
   @Column('datetime', { name: 'missing_time', nullable: true })
   missingTime: string | null;
