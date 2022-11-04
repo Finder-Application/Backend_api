@@ -108,7 +108,7 @@ QueryBuilder.prototype.searchByString = function (q, columnNames) {
   this.andWhere(
     new Brackets(qb => {
       for (const item of columnNames) {
-        qb.orWhere(`${item} ILIKE :q`);
+        qb.orWhere(`${item} LIKE :q`);
       }
     }),
   );

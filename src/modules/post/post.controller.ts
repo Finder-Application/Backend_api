@@ -60,10 +60,7 @@ export class PostController {
   @Put(':id')
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiAcceptedResponse()
-  updatePost(
-    @Param('id') id: Uuid,
-    @Body() updatePostDto: UpdatePostDto,
-  ): Promise<void> {
+  updatePost(@Param('id') id: Uuid, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.updatePost(id, updatePostDto);
   }
 
