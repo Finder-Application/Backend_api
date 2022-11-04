@@ -297,7 +297,6 @@ module.exports = {
     'no-new-func': 'error',
     'no-new-wrappers': 'error',
     'no-redeclare': 'error',
-    'no-return-await': 'error',
     'no-sequences': 'error',
     'no-sparse-arrays': 'error',
     'no-template-curly-in-string': 'error',
