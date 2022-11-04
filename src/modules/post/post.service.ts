@@ -122,8 +122,10 @@ export class PostService {
     return new PostConvertToResDto(postEntity);
   }
 
-  async updatePost(id: Uuid, data: UpdatePostDto): Promise<void> {
-    const dataUpdate = new PostConvertToDBDto(data);
+  async updatePost(
+    id: string,
+    dataUpdated: UpdatePostDto,
+  ): Promise<PostConvertToResDto> {
     const currentPost = await this.postRepository.findOne({
       where: {
         id: id as unknown as number,
@@ -132,16 +134,19 @@ export class PostService {
     if (!currentPost) {
       throw new PostNotFoundException('Post Not Found');
     }
-
-    // const oldPhotos = currentPost?.photos?.split(',') || [];
-    // const { photos: newPhotos = [] } = data;
-
-    // // ** Remove duplicate photos
-    // const photos = new Set(oldPhotos.concat(newPhotos));
-
-    const newData = this.postRepository.merge(currentPost, dataUpdate);
-
-    await this.postRepository.save(newData);
+    const { photos: newPhotos = [] } = dataUpdated;
+    const oldPhotos = currentPost.photos?.split(',') || [];
+    const photosUpdated = [...new Set([...oldPhotos, ...newPhotos])];
+    const newData = this.postRepository.merge({
+      ...currentPost,
+      photos: photosUpdated.join(','),
+    });
+    const { descriptors } = dataUpdated;
+    const [postUpdated] = await Promise.all([
+      this.postRepository.save(newData),
+      this.firebase.updateDescriptors(id, photosUpdated, descriptors),
+    ]);
+    return new PostConvertToResDto(postUpdated);
   }
 
   async deletePost(id: Uuid): Promise<ResponseSuccessDto> {
@@ -149,14 +154,16 @@ export class PostService {
       .createQueryBuilder('posts')
       .where('posts.id = :id', { id });
 
-    const postEntity = await queryBuilder.getOne();
-
-    if (!postEntity) {
+    const postData = await queryBuilder.getOne();
+    if (!postData) {
       throw new PostNotFoundException();
     }
 
-    await this.postRepository.remove(postEntity);
+    const [postRemoved] = await Promise.all([
+      this.postRepository.remove(postData),
+      this.firebase.deleteDescriptors(id),
+    ]);
 
-    return new ResponseSuccessDto('Delete post success', { id });
+    return new ResponseSuccessDto('Delete post success', postRemoved);
   }
 }

@@ -128,3 +128,10 @@ export interface Descriptor {
   126: number;
   127: number;
 }
+export interface FaceCollection {
+  post_id: number;
+  descriptors: Array<{
+    descriptor: Descriptor;
+    id: string;
+  }>;
+}

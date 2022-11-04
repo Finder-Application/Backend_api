@@ -64,7 +64,6 @@ export class Posts {
   @Column('varchar', { name: 'missing_commune', nullable: true, length: 100 })
   missingCommune: string | null;
 
-
   @Column('datetime', { name: 'missing_time', nullable: true })
   missingTime: string | null;
 
