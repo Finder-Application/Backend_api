@@ -19,7 +19,7 @@ import { Session } from 'interfaces/request';
 
 import { ApiPageOkResponse, Auth, GetSession } from '../../decorators';
 import { CreatePostDto } from './dtos/create-post.dto';
-import { PostConvertToResDto } from './dtos/post.dto';
+import { PostResDto } from './dtos/post-res.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { PostService } from './post.service';
 
@@ -31,7 +31,7 @@ export class PostController {
   @Post()
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: PostConvertToResDto })
+  @ApiOkResponse({ type: PostResDto })
   async createSinglePost(
     @Body() createPost: CreatePostDto,
     @GetSession() session: Session,
@@ -40,7 +40,7 @@ export class PostController {
   }
 
   @Get()
-  @ApiPageOkResponse({ type: PostConvertToResDto })
+  @ApiPageOkResponse({ type: PostResDto })
   getPostsPagination(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: PageOptionsDto,
@@ -52,7 +52,7 @@ export class PostController {
   @Get(':id')
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: PostConvertToResDto })
+  @ApiOkResponse({ type: PostResDto })
   async getSinglePost(@Param('id') id: Uuid) {
     return this.postService.getSinglePost(id);
   }
@@ -60,10 +60,7 @@ export class PostController {
   @Put(':id')
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiAcceptedResponse()
-  updatePost(
-    @Param('id') id: Uuid,
-    @Body() updatePostDto: UpdatePostDto,
-  ): Promise<void> {
+  updatePost(@Param('id') id: Uuid, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.updatePost(id, updatePostDto);
   }
 
@@ -71,6 +68,14 @@ export class PostController {
   @ApiAcceptedResponse({ type: ResponseSuccessDto })
   async deletePost(@Param('id') id: Uuid): Promise<ResponseSuccessDto> {
     return this.postService.deletePost(id);
+  }
+
+  @Get(':id')
+  @Auth({ public: false })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: Array<PostResDto> })
+  async getRelevantPost(@Param('id') id: Uuid) {
+    return this.postService.getPostRelevant(Number(id));
   }
 }
 
@@ -80,7 +85,7 @@ export class PostPublicController {
   constructor(private postService: PostService) {}
 
   @Get()
-  @ApiOkResponse({ type: PostConvertToResDto })
+  @ApiOkResponse({ type: PostResDto })
   getPostsPagination(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: PageOptionsDto,

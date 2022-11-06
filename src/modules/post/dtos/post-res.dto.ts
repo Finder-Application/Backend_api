@@ -1,10 +1,10 @@
 import { Posts } from 'database/entities/Posts';
 import { UserPublicDto } from 'modules/user/dtos/user.dto';
 
-export class PostConvertToResDto extends Posts {
+export class PostResDto extends Posts {
   hometown: Record<string, string | null> = {};
   missingAddress: Record<string, string | null> = {};
-  owner: UserPublicDto | {};
+  owner: UserPublicDto | Record<K, V>;
   constructor(post: Posts) {
     super();
     for (const key of Object.keys(post)) {

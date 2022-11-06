@@ -6,13 +6,13 @@ import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Posts } from 'database/entities/Posts';
 import { FirebaseService } from 'modules/firebase/firebase.service';
 import { ApiConfigService } from 'shared/services/api-config.service';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ValidatorService } from '../../shared/services/validator.service';
 import { DateService } from './../../shared/services/Date.service';
 import { CreatePostDto } from './dtos/create-post.dto';
-import { PostConvertToDBDto } from './dtos/post-convert.dto';
+import { PostDBDto } from './dtos/post-convert.dto';
 import { PostPageOptionsDto } from './dtos/post-page-options.dto';
-import { PostConvertToResDto } from './dtos/post-res.dto';
+import { PostResDto } from './dtos/post-res.dto';
 import type { UpdatePostDto } from './dtos/update-post.dto';
 import { PostExistedException } from './exceptions/post-existed.expection';
 import { PostNotFoundException } from './exceptions/post-not-found.exception';
@@ -30,7 +30,7 @@ export class PostService {
   async getPostsPagination(
     pageOptionsDto: PostPageOptionsDto,
     userId?: number,
-  ): Promise<PageDto<PostConvertToResDto>> {
+  ): Promise<PageDto<PostResDto>> {
     try {
       const queryBuilder = this.postRepository
         .createQueryBuilder('posts')
@@ -43,16 +43,16 @@ export class PostService {
 
       const [items, pageMetaDto] = await queryBuilder.paginate(
         pageOptionsDto,
-        e => new PostConvertToResDto(e),
+        e => new PostResDto(e),
       );
 
-      return items.toPageDto<PostConvertToResDto>(pageMetaDto);
+      return items.toPageDto<PostResDto>(pageMetaDto);
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
-  async getSinglePost(id: Uuid): Promise<PostConvertToResDto> {
+  async getSinglePost(id: Uuid): Promise<PostResDto> {
     const queryBuilder = this.postRepository
       .createQueryBuilder('posts')
       .where('posts.id = :id', { id })
@@ -65,13 +65,13 @@ export class PostService {
       throw new PostNotFoundException();
     }
 
-    return new PostConvertToResDto(postEntity);
+    return new PostResDto(postEntity);
   }
 
   async createSinglePost(
     createPost: CreatePostDto,
     userId: number,
-  ): Promise<PostConvertToResDto> {
+  ): Promise<PostResDto> {
     const { descriptors, ...postData } = createPost;
 
     const isExistedPost = await this.postRepository.findOne({
@@ -91,13 +91,13 @@ export class PostService {
     });
     if (isExistedPost) {
       throw new PostExistedException(
-        new PostConvertToResDto(isExistedPost),
+        new PostResDto(isExistedPost),
         'Post information is existed',
       );
     }
 
     const newPost = this.postRepository.create({
-      ...new PostConvertToDBDto(postData),
+      ...new PostDBDto(postData),
       userId,
     });
     const postCreated = await this.postRepository.save(newPost);
@@ -119,20 +119,20 @@ export class PostService {
     if (!postEntity) {
       throw new PostNotFoundException();
     }
-    return new PostConvertToResDto(postEntity);
+    return new PostResDto(postEntity);
   }
 
   async updatePost(
     id: string,
     dataUpdated: UpdatePostDto,
-  ): Promise<PostConvertToResDto> {
+  ): Promise<PostResDto> {
     const currentPost = await this.postRepository.findOne({
       where: {
         id: id as unknown as number,
       },
     });
     if (!currentPost) {
-      throw new PostNotFoundException('Post Not Found');
+      throw new PostNotFoundException();
     }
     const { photos: newPhotos = [] } = dataUpdated;
     const oldPhotos = currentPost.photos?.split(',') || [];
@@ -146,7 +146,7 @@ export class PostService {
       this.postRepository.save(newData),
       this.firebase.updateDescriptors(id, photosUpdated, descriptors),
     ]);
-    return new PostConvertToResDto(postUpdated);
+    return new PostResDto(postUpdated);
   }
 
   async deletePost(id: Uuid): Promise<ResponseSuccessDto> {
@@ -158,12 +158,31 @@ export class PostService {
     if (!postData) {
       throw new PostNotFoundException();
     }
-
     const [postRemoved] = await Promise.all([
       this.postRepository.remove(postData),
       this.firebase.deleteDescriptors(id),
     ]);
 
     return new ResponseSuccessDto('Delete post success', postRemoved);
+  }
+
+  async getPostRelevant(id: number): Promise<PostResDto[]> {
+    const postData = await this.postRepository.findOne({
+      where: { id },
+    });
+    if (!postData) {
+      throw new PostNotFoundException();
+    }
+    const { relevantPosts } = postData;
+    if (!relevantPosts) {
+      return [];
+    }
+    const posts = await this.postRepository.find({
+      where: {
+        relevantPosts: In<string>(relevantPosts.split(',')),
+      },
+    });
+
+    return posts.map(post => new PostResDto(post));
   }
 }

@@ -2,7 +2,7 @@ import { Posts } from 'database/entities/Posts';
 import { DateService } from './../../../shared/services/Date.service';
 import { CreatePostDto } from './create-post.dto';
 
-export class PostConvertToDBDto extends Posts {
+export class PostDBDto extends Posts {
   constructor(post: CreatePostDto) {
     super();
     this.gender = post.gender || null;

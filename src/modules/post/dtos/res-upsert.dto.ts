@@ -1,7 +1,7 @@
-import { PostConvertToResDto } from './post-res.dto';
-export class ResponseUpsertPostDto {
-  private data: PostConvertToResDto;
-  constructor(post: PostConvertToResDto) {
+import { PostResDto } from './post-res.dto';
+export class ResponsePostDto {
+  private data: PostResDto;
+  constructor(post: PostResDto) {
     this.data = post;
   }
 }
