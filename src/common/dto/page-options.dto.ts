@@ -16,7 +16,6 @@ export class OrderDto {
 
 export enum EFilter {
   IsNull = 'ISNULL',
-  ILike = 'ILIKE',
   Like = 'LIKE',
   Equal = 'EQUAL',
   MoreThanOrEqual = 'MORETHANOREQUAL',
@@ -114,7 +113,6 @@ export class PageOptionsDto {
 
     enum Operator {
         IsNull = 'ISNULL',
-        ILike = 'ILIKE',
         Like = 'LIKE',
         Equal = 'EQUAL',
         MoreThanOrEqual = 'MORETHANOREQUAL',
