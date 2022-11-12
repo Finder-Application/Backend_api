@@ -72,7 +72,7 @@ out
 gen
 dist
 mongo
-
+build
 
 # Docker compose ganarated files
 db-data

@@ -31,8 +31,10 @@ import { ApiConfigService } from './shared/services/api-config.service';
     }),
     TypeOrmModule.forRootAsync({
       imports: [SharedModule],
-      useFactory: (configService: ApiConfigService) =>
-        configService.postgresConfig,
+      useFactory: (configService: ApiConfigService) => ({
+        ...configService.postgresConfig,
+      }),
+
       inject: [ApiConfigService],
     }),
     HealthCheckerModule,
