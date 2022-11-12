@@ -70,7 +70,7 @@ export class PostController {
     return this.postService.deletePost(id);
   }
 
-  @Get(':id')
+  @Get('relevant/:id')
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: Array<PostResDto> })
