@@ -22,7 +22,7 @@ export class Posts {
   @Column('int', { name: 'user_id' })
   userId: number;
 
-  @Column('varchar', { name: 'title', nullable: true, length: 50 })
+  @Column('varchar', { name: 'title', nullable: true, length: 200 })
   title: string | null;
 
   @Column('varchar', { name: 'full_name', length: 100 })
