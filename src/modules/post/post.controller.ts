@@ -28,6 +28,13 @@ import { PostService } from './post.service';
 export class PostController {
   constructor(private postService: PostService) {}
 
+  @Get('relevant/:id')
+  @Auth({ public: false })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: Array<PostResDto> })
+  async getRelevantPost(@Param('id') id: Uuid) {
+    return this.postService.getPostRelevant(Number(id));
+  }
   @Post()
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
@@ -68,14 +75,6 @@ export class PostController {
   @ApiAcceptedResponse({ type: ResponseSuccessDto })
   async deletePost(@Param('id') id: Uuid): Promise<ResponseSuccessDto> {
     return this.postService.deletePost(id);
-  }
-
-  @Get('relevant/:id')
-  @Auth({ public: false })
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: Array<PostResDto> })
-  async getRelevantPost(@Param('id') id: Uuid) {
-    return this.postService.getPostRelevant(Number(id));
   }
 }
 
