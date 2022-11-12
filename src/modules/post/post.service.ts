@@ -113,7 +113,7 @@ export class PostService {
 
     const [postEntity] = await Promise.all([
       queryBuilder.getOne(),
-      this.firebase.saveDescriptors(descriptors),
+      this.firebase.saveDescriptors(postCreated.id, descriptors),
     ]);
 
     if (!postEntity) {
@@ -184,5 +184,18 @@ export class PostService {
     });
 
     return posts.map(post => new PostResDto(post));
+  }
+
+  async getPostRelevantNetwork(id: number) {
+    const postData = await this.postRepository.findOne({
+      where: { id },
+      relations: {
+        relevantNetworkPosts: true,
+      },
+    });
+    if (!postData) {
+      throw new PostNotFoundException();
+    }
+    return postData;
   }
 }

@@ -35,6 +35,14 @@ export class PostController {
   async getRelevantPost(@Param('id') id: Uuid) {
     return this.postService.getPostRelevant(Number(id));
   }
+
+  @Get('relevant-network/:id')
+  @Auth({ public: false })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: Array<PostResDto> })
+  async getRelevantNetwork(@Param('id') id: Uuid) {
+    return this.postService.getPostRelevantNetwork(Number(id));
+  }
   @Post()
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)

@@ -18,10 +18,10 @@ export class FirebaseService implements OnModuleInit {
   }
 
   async saveDescriptors(
+    post_id: number,
     descriptors?: CreatePostDto['descriptors'],
-    post_id?: number,
   ) {
-    if (!descriptors?.length || !post_id) {
+    if (!descriptors?.length) {
       return null;
     }
     return this.fireStore.collection(this.collection).doc(String(post_id)).set({
