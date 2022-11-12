@@ -18,6 +18,7 @@ export class FirebaseService implements OnModuleInit {
   }
 
   async saveDescriptors(
+    user_id: number,
     post_id: number,
     descriptors?: CreatePostDto['descriptors'],
   ) {
@@ -27,6 +28,7 @@ export class FirebaseService implements OnModuleInit {
     return this.fireStore.collection(this.collection).doc(String(post_id)).set({
       post_id,
       descriptors,
+      user_id,
     });
   }
   async deleteDescriptors(post_id: string) {

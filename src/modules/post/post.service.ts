@@ -114,7 +114,7 @@ export class PostService {
 
       const [postEntity] = await Promise.all([
         queryBuilder.getOne(),
-        this.firebase.saveDescriptors(postCreated.id, descriptors),
+        this.firebase.saveDescriptors(userId, postCreated.id, descriptors),
       ]);
 
       if (!postEntity) {
