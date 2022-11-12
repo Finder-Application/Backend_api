@@ -18,6 +18,7 @@ import {
   patchTypeORMRepositoryWithBaseRepository,
 } from 'typeorm-transactional-cls-hooked';
 
+import { json } from 'body-parser';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './filters/bad-request.filter';
 import { QueryFailedFilter } from './filters/query-failed.filter';
@@ -43,6 +44,8 @@ export async function bootstrap(): Promise<NestExpressApplication> {
       max: 1000, // limit each IP to 100 requests per windowMs
     }),
   );
+  app.use(json({ limit: '100mb' }));
+
   app.use(compression());
   app.use(morgan('combined'));
   app.enableVersioning();
