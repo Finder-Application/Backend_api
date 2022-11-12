@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PageDto } from 'common/dto/page.dto';
 import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Posts } from 'database/entities/Posts';
+import { ServerError } from 'exceptions/server-errror.exceptions';
 import { FirebaseService } from 'modules/firebase/firebase.service';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { In, Repository } from 'typeorm';
@@ -71,55 +72,62 @@ export class PostService {
   async createSinglePost(
     createPost: CreatePostDto,
     userId: number,
-  ): Promise<PostResDto> {
-    const { descriptors, ...postData } = createPost;
+  ): Promise<PostResDto | ServerError> {
+    try {
+      const { descriptors, ...postData } = createPost;
+      const isExistedPost = await this.postRepository.findOne({
+        where: {
+          fullName: postData.fullName,
+          dateOfBirth: DateService.getOnlyDate(postData.dateOfBirth),
+          gender: postData.gender,
+          missingRegion: postData.missingAddress?.region,
+          hometownRegion: postData.hometown?.region,
+          hometownCommune: postData.hometown?.commune,
+          hometownHamlet: postData.hometown?.commune,
+          hometownState: postData.hometown?.state,
+        },
+        relations: {
+          user: true,
+        },
+      });
+      if (isExistedPost) {
+        throw new PostExistedException(
+          new PostResDto(isExistedPost),
+          'Post information is existed',
+        );
+      }
 
-    const isExistedPost = await this.postRepository.findOne({
-      where: {
-        fullName: postData.fullName,
-        dateOfBirth: DateService.getOnlyDate(postData.dateOfBirth),
-        gender: postData.gender,
-        missingRegion: postData.missingAddress?.region,
-        hometownRegion: postData.hometown?.region,
-        hometownCommune: postData.hometown?.commune,
-        hometownHamlet: postData.hometown?.commune,
-        hometownState: postData.hometown?.state,
-      },
-      relations: {
-        user: true,
-      },
-    });
-    if (isExistedPost) {
-      throw new PostExistedException(
-        new PostResDto(isExistedPost),
-        'Post information is existed',
+      const newPost = this.postRepository.create({
+        ...new PostDBDto(postData),
+        userId,
+      });
+      const postCreated = await this.postRepository.save(newPost);
+      if (!postCreated.id) {
+        throw new PostNotFoundException();
+      }
+
+      const queryBuilder = this.postRepository
+        .createQueryBuilder('posts')
+        .where('posts.id = :id', { id: postCreated.id })
+        .leftJoinAndSelect('posts.user', 'user')
+        .leftJoinAndSelect('user.account', 'account');
+
+      const [postEntity] = await Promise.all([
+        queryBuilder.getOne(),
+        this.firebase.saveDescriptors(postCreated.id, descriptors),
+      ]);
+
+      if (!postEntity) {
+        throw new PostNotFoundException();
+      }
+      return new PostResDto(postEntity);
+    } catch (error) {
+      console.error(
+        '🚀 ~ file: post.service.ts ~ line 125 ~ PostService ~ error',
+        error,
       );
+      return new ServerError();
     }
-
-    const newPost = this.postRepository.create({
-      ...new PostDBDto(postData),
-      userId,
-    });
-    const postCreated = await this.postRepository.save(newPost);
-    if (!postCreated.id) {
-      throw new PostNotFoundException();
-    }
-
-    const queryBuilder = this.postRepository
-      .createQueryBuilder('posts')
-      .where('posts.id = :id', { id: postCreated.id })
-      .leftJoinAndSelect('posts.user', 'user')
-      .leftJoinAndSelect('user.account', 'account');
-
-    const [postEntity] = await Promise.all([
-      queryBuilder.getOne(),
-      this.firebase.saveDescriptors(postCreated.id, descriptors),
-    ]);
-
-    if (!postEntity) {
-      throw new PostNotFoundException();
-    }
-    return new PostResDto(postEntity);
   }
 
   async updatePost(
