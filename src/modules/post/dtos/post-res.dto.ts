@@ -5,7 +5,7 @@ export class PostResDto extends Posts {
   hometown: Record<string, string | null> = {};
   missingAddress: Record<string, string | null> = {};
   owner: UserPublicDto | Record<string, string>;
-  constructor(post: Posts) {
+  constructor(post: Posts, hasContact?: boolean) {
     super();
     for (const key of Object.keys(post)) {
       if (
@@ -25,6 +25,6 @@ export class PostResDto extends Posts {
     this.missingAddress.region = post.missingRegion;
     this.missingTime = post.missingTime;
     this.photos = post.photos?.split(',') as unknown as string;
-    this.owner = new UserPublicDto(post.user);
+    this.owner = new UserPublicDto(post.user, post.userId, hasContact);
   }
 }

@@ -65,7 +65,7 @@ export class PostService {
       throw new PostNotFoundException();
     }
 
-    return new PostResDto(postEntity);
+    return new PostResDto(postEntity, true);
   }
 
   async createSinglePost(

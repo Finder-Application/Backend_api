@@ -20,13 +20,27 @@ export class UserPublicDto {
   @ApiPropertyOptional()
   uuid?: string;
 
-  constructor(user?: Partial<Users>, uuid?: string) {
+  @ApiPropertyOptional()
+  phone?: string;
+
+  @ApiPropertyOptional()
+  email?: string;
+
+  @ApiPropertyOptional()
+  address?: string;
+
+  constructor(user?: Partial<Users>, uuid?: string, hasContact?: boolean) {
     if (user) {
       this.firstName = user.firstName;
       this.lastName = user.lastName;
       this.middleName = user.middleName || '';
       this.avatar = user.avatar || '';
       this.uuid = uuid ?? user.account?.uuid;
+      if (hasContact) {
+        this.email = String(user.email);
+        this.phone = String(user.phone);
+        this.address = String(user.address);
+      }
     }
   }
 }
