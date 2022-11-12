@@ -67,7 +67,7 @@ export class Posts {
   @Column('datetime', { name: 'missing_time', nullable: true })
   missingTime: string | null;
 
-  @Column('varchar', { name: 'photos', length: 500 })
+  @Column('varchar', { name: 'photos', length: 2000 })
   photos: string | null;
 
   @Column('varchar', { name: 'relationship', nullable: true, length: 45 })
