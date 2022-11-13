@@ -189,6 +189,9 @@ export class PostService {
       where: {
         id: In<string>(relevantPosts.split(',').filter(Boolean)),
       },
+      relations: {
+        user: true,
+      },
     });
 
     return posts.map(post => new PostResDto(post));
