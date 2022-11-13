@@ -187,7 +187,7 @@ export class PostService {
     }
     const posts = await this.postRepository.find({
       where: {
-        relevantPosts: In<string>(relevantPosts.split(',')),
+        id: In<string>(relevantPosts.split(',').filter(Boolean)),
       },
     });
 
