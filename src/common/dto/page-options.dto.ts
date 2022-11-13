@@ -90,11 +90,11 @@ export class PageOptionsDto {
   @ApiProperty({
     description: `
     # How to use order
-    
+
     order?: string;
 
     ## Example order : 'content:ASC'
-    
+
     *Explanation:*
     | Name        | Description                                                                |
     | ----------- | ---------------------------------------------------------------------------|
@@ -132,7 +132,7 @@ export class PageOptionsDto {
 
     ## Example filter : [{"field":"content","operator":"LIKE","value":"cin"}]
     (This example when in api get comments pagination , you can reused for the other api pagination , as long as your field correct with table of api)
-    
+
     *Explanation:*
     | Name        | Description                                                                |
     | ----------- | ---------------------------------------------------------------------------|
