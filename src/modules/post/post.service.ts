@@ -45,6 +45,7 @@ export class PostService {
       const [items, pageMetaDto] = await queryBuilder.paginate(
         pageOptionsDto,
         e => new PostResDto(e),
+        'posts',
       );
 
       return items.toPageDto<PostResDto>(pageMetaDto);

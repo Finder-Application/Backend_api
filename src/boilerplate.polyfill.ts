@@ -151,9 +151,34 @@ SelectQueryBuilder.prototype.paginate = async function (
       throw new BadRequestException(error);
     }
     const newFilter = JSON.parse(filter) as CFilter[];
-
     newFilter.forEach(e => {
-      this.andWhere(`${nameTable}.${e.field} ${e.operator} (:value)`, {
+      let operatorSQL = e.operator;
+      switch (e.operator) {
+        case 'EQUAL': {
+          operatorSQL = '=';
+          break;
+        }
+        case 'MoreThanOrEqual': {
+          operatorSQL = '>=';
+          break;
+        }
+        case 'MoreThan': {
+          operatorSQL = '>';
+          break;
+        }
+        case 'LessThan': {
+          operatorSQL = '<';
+          break;
+        }
+        case 'LessThanOrEqual': {
+          operatorSQL = '<=';
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      this.andWhere(`${nameTable}.${e.field} ${operatorSQL} (:value)`, {
         value: e.value,
       });
     });
