@@ -169,7 +169,7 @@ export class AuthService {
       .createQueryBuilder()
       .update(Accounts)
       .set({ password: this.validator.encryptionPassword(password) })
-      .where('userName = :email', { email })
+      .where('username = :email', { email })
       .execute();
 
     const [account] = await Promise.all([

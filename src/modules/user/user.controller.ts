@@ -6,7 +6,7 @@ import {
   Param,
   Put,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetSession } from 'decorators';
 import { Session } from 'interfaces/request';
 import { UserDto } from './dtos/user.dto';
@@ -14,6 +14,7 @@ import { UserDto } from './dtos/user.dto';
 import { UserService } from './user.service';
 
 @ApiTags('users')
+@ApiBearerAuth()
 @Controller('private/users')
 export class UserController {
   constructor(private userService: UserService) {}
