@@ -5,6 +5,7 @@ import { PageDto } from 'common/dto/page.dto';
 import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Posts } from 'database/entities/Posts';
 import { ServerError } from 'exceptions/server-errror.exceptions';
+import { isEmpty } from 'lodash';
 import { FirebaseService } from 'modules/firebase/firebase.service';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { In, Repository } from 'typeorm';
@@ -13,6 +14,7 @@ import { DateService } from './../../shared/services/Date.service';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { PostDBDto } from './dtos/post-convert.dto';
 import { PostPageOptionsDto } from './dtos/post-page-options.dto';
+import { PostRelevantResDto } from './dtos/post-relevants-res.dto';
 import { PostResDto } from './dtos/post-res.dto';
 import type { UpdatePostDto } from './dtos/update-post.dto';
 import { PostExistedException } from './exceptions/post-existed.expection';
@@ -153,7 +155,12 @@ export class PostService {
     const { descriptors } = dataUpdated;
     const [postUpdated] = await Promise.all([
       this.postRepository.save(newData),
-      this.firebase.updateDescriptors(id, photosUpdated, descriptors),
+      this.firebase.updateDescriptors(
+        id,
+        currentPost.userId,
+        photosUpdated,
+        descriptors,
+      ),
     ]);
     return new PostResDto(postUpdated);
   }
@@ -186,16 +193,36 @@ export class PostService {
     if (!relevantPosts) {
       return [];
     }
+
+    const relevantPostsInfo = relevantPosts
+      .split(';')
+      .filter(item => !isEmpty(item))
+      .map(
+        item =>
+          JSON.parse(item) as {
+            post_id: number;
+            similar: number;
+          },
+      );
     const posts = await this.postRepository.find({
       where: {
-        id: In<string>(relevantPosts.split(',').filter(Boolean)),
+        id: In<number>(relevantPostsInfo.map(item => item.post_id)),
+      },
+      relations: {
+        user: true,
       },
       relations: {
         user: true,
       },
     });
 
-    return posts.map(post => new PostResDto(post));
+    return posts.map(
+      post =>
+        new PostRelevantResDto(
+          post,
+          relevantPostsInfo.find(item => item.post_id === post.id)?.similar,
+        ),
+    );
   }
 
   async getPostRelevantNetwork(id: number) {
@@ -208,6 +235,6 @@ export class PostService {
     if (!postData) {
       throw new PostNotFoundException();
     }
-    return postData;
+    return postData.relevantNetworkPosts;
   }
 }

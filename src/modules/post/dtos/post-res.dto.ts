@@ -11,7 +11,8 @@ export class PostResDto extends Posts {
       if (
         key !== 'user' &&
         !key.includes('hometown') &&
-        !key.includes('missing')
+        !key.includes('missing') &&
+        !key.includes('relevantPosts')
       ) {
         this[key] = post[key];
       }
