@@ -146,7 +146,7 @@ export class PostService {
       throw new PostNotFoundException();
     }
     const { photos: newPhotos = [] } = dataUpdated;
-    const oldPhotos = currentPost.photos?.split(',') || [];
+    const oldPhotos = currentPost.photos.split(',') || [];
     const photosUpdated = [...new Set([...oldPhotos, ...newPhotos])];
     const newData = this.postRepository.merge({
       ...currentPost,
@@ -207,9 +207,6 @@ export class PostService {
     const posts = await this.postRepository.find({
       where: {
         id: In<number>(relevantPostsInfo.map(item => item.post_id)),
-      },
-      relations: {
-        user: true,
       },
       relations: {
         user: true,
