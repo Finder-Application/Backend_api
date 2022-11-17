@@ -43,17 +43,17 @@ export class SubComments {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => Comments, (comments) => comments.subComments, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  })
-  @JoinColumn([{ name: "sub_for", referencedColumnName: "id" }])
-  subFor2: Comments;
-
   @ManyToOne(() => Users, (users) => users.subComments, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
   user: Users;
+
+  @ManyToOne(() => Comments, (comments) => comments.subComments, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
+  @JoinColumn([{ name: "sub_for", referencedColumnName: "id" }])
+  subFor2: Comments;
 }

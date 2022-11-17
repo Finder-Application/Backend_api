@@ -1,4 +1,11 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Posts } from "./Posts";
 import { Users } from "./Users";
 
@@ -6,7 +13,7 @@ import { Users } from "./Users";
 @Index("fk_post_notifications_post_id_idx", ["postId"], {})
 @Entity("post_notifications", { schema: "capstone_prod" })
 export class PostNotifications {
-  @Column("int", { primary: true, name: "id" })
+  @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
   @Column("int", { name: "user_id" })
@@ -21,12 +28,20 @@ export class PostNotifications {
   @Column("text", { name: "content" })
   content: string;
 
-  @ManyToOne(() => Posts, (posts) => posts.postNotifications, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+  @Column("varchar", { name: "title", length: 200 })
+  title: string;
+
+  @Column("datetime", {
+    name: "created_at",
+    default: () => "CURRENT_TIMESTAMP",
   })
-  @JoinColumn([{ name: "post_id", referencedColumnName: "id" }])
-  post: Posts;
+  createdAt: Date;
+
+  @Column("datetime", {
+    name: "updated_at",
+    default: () => "CURRENT_TIMESTAMP",
+  })
+  updatedAt: Date;
 
   @ManyToOne(() => Users, (users) => users.postNotifications, {
     onDelete: "NO ACTION",
@@ -34,4 +49,11 @@ export class PostNotifications {
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
   user: Users;
+
+  @ManyToOne(() => Posts, (posts) => posts.postNotifications, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "post_id", referencedColumnName: "id" }])
+  post: Posts;
 }

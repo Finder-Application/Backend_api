@@ -6,7 +6,11 @@ import { PostNotifications } from 'database/entities/PostNotifications';
 import { Users } from 'database/entities/Users';
 import { PostPageOptionsDto } from 'modules/post/dtos/post-page-options.dto';
 import { Repository } from 'typeorm';
-import { CountNotificationDto, NotificationDto } from './dtos/notification.dto';
+import {
+  CountNotificationDto,
+  NotificationCmtDto,
+  NotificationPostDto,
+} from './dtos/notification.dto';
 
 @Injectable()
 export class NotificationService {
@@ -21,62 +25,62 @@ export class NotificationService {
 
   //TODO: count all notification
   async countNotifications(userId: number): Promise<CountNotificationDto> {
-    const query = await this.usersRepository
-      .createQueryBuilder('user')
-      .select([
-        'user.id',
-        'postNotifications.seen',
-        'commentNotifications.seen',
-      ])
-      .leftJoinAndSelect(
-        'user.postNotifications',
-        'postNotifications',
-        'postNotifications.seen = :isSeen',
-        {
-          isSeen: false,
+    const [postNoti, cmtNoti] = await Promise.all([
+      this.postNotiRepository.count({
+        where: {
+          userId,
+          seen: false,
         },
-      )
-      .leftJoinAndSelect(
-        'user.commentNotifications',
-        'commentNotifications',
-        'commentNotifications.seen = :isSeen',
-        {
-          isSeen: false,
+      }),
+      this.comNotiRepository.count({
+        where: {
+          userId,
+          seen: false,
         },
-      )
-      .where('user.id = :id', { id: userId })
-      .getOne();
+      }),
+    ]);
 
     return {
-      count:
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        (query?.commentNotifications?.length || 0) +
-        (query?.postNotifications?.length || 0),
+      count: postNoti + cmtNoti,
     };
   }
-  //   //TODO: pagination get notification
-  async getPostNotifications(
+
+  async getCmtNotifications(
     userId: number,
-    postsPageOptionsDto: PostPageOptionsDto,
-  ): Promise<PageDto<NotificationDto>> {
-    const queryBuilder = this.postNotiRepository
-      .createQueryBuilder('post')
-      .where('post.userId = :userId', { userId });
+    pageOptionsDto: PostPageOptionsDto,
+  ): Promise<PageDto<NotificationCmtDto>> {
+    const queryBuilder = this.comNotiRepository
+      .createQueryBuilder('comNotiRepository')
+      .leftJoinAndSelect('comNotiRepository.comment', 'comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .where('comNotiRepository.userId = :userId', { userId });
+
+    console.info('queryBuilder', await queryBuilder.execute());
     const [items, pageMetaDto] = await queryBuilder.paginate(
-      postsPageOptionsDto,
+      pageOptionsDto,
+      e => new NotificationCmtDto(e),
+      'commentNotifications',
     );
 
     return items.toPageDto(pageMetaDto);
   }
 
-  //   async getComNotifications(userId: number): Promise<PageDto<PostNotificationDto>> {
-  //     const queryBuilder = this.postRepository
-  //       .createQueryBuilder('post')
-  //       .leftJoinAndSelect('post.translations', 'postTranslation');
-  //     const [items, pageMetaDto] = await queryBuilder.paginate(
-  //       postPageOptionsDto,
-  //     );
+  async getPostNotifications(
+    userId: number,
+    pageOptionsDto: PostPageOptionsDto,
+  ): Promise<PageDto<NotificationPostDto>> {
+    const queryBuilder = this.postNotiRepository
+      .createQueryBuilder('postNotiRepository')
+      .leftJoinAndSelect('postNotiRepository.user', 'user')
+      .where('postNotiRepository.userId = :userId', { userId });
 
-  //     return items.toPageDto(pageMetaDto);
-  //   }
+    console.info('queryBuilder', await queryBuilder.execute());
+    const [items, pageMetaDto] = await queryBuilder.paginate(
+      pageOptionsDto,
+      e => new NotificationPostDto(e),
+      'postNotifications',
+    );
+
+    return items.toPageDto(pageMetaDto);
+  }
 }

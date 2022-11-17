@@ -33,19 +33,17 @@ export class CommentNotifications {
   @Column("text", { name: "content" })
   content: string;
 
-  @Column("varchar", {
-    name: "comment_notificationscol",
-    nullable: true,
-    length: 45,
+  @Column("datetime", {
+    name: "created_at",
+    default: () => "CURRENT_TIMESTAMP",
   })
-  commentNotificationscol: string | null;
+  createdAt: Date;
 
-  @ManyToOne(() => Comments, (comments) => comments.commentNotifications, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+  @Column("datetime", {
+    name: "updated_at",
+    default: () => "CURRENT_TIMESTAMP",
   })
-  @JoinColumn([{ name: "comment_id", referencedColumnName: "id" }])
-  comment: Comments;
+  updatedAt: Date;
 
   @ManyToOne(() => Posts, (posts) => posts.commentNotifications, {
     onDelete: "NO ACTION",
@@ -53,6 +51,13 @@ export class CommentNotifications {
   })
   @JoinColumn([{ name: "post_id", referencedColumnName: "id" }])
   post: Posts;
+
+  @ManyToOne(() => Comments, (comments) => comments.commentNotifications, {
+    onDelete: "NO ACTION",
+    onUpdate: "NO ACTION",
+  })
+  @JoinColumn([{ name: "comment_id", referencedColumnName: "id" }])
+  comment: Comments;
 
   @ManyToOne(() => Users, (users) => users.commentNotifications, {
     onDelete: "NO ACTION",

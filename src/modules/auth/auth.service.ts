@@ -64,7 +64,7 @@ export class AuthService {
   async login(userLoginDto: UserLoginDto): Promise<LoginPayloadDto> {
     const account = await this.accountsRepository.findOne({
       where: {
-        username: userLoginDto.email,
+        userName: userLoginDto.email,
       },
       relations: {
         users: true,
@@ -76,7 +76,7 @@ export class AuthService {
       this.validator.comparePw(account.password, userLoginDto.password)
     ) {
       const token = await this.createAccessToken({
-        userName: account.username,
+        userName: account.userName,
         uuid: account.uuid,
         userId: account.users[0].id,
       });
@@ -113,7 +113,7 @@ export class AuthService {
   async register(userRegisterDto: UserRegisterDto): Promise<LoginPayloadDto> {
     const findAccount = await this.accountsRepository.findOne({
       where: {
-        username: userRegisterDto.email,
+        userName: userRegisterDto.email,
       },
     });
 
@@ -127,7 +127,7 @@ export class AuthService {
   async forgotPw(email: string): Promise<ResponseSuccessDto> {
     const account = await this.accountsRepository.findOne({
       where: {
-        username: email,
+        userName: email,
       },
     });
 
@@ -169,13 +169,13 @@ export class AuthService {
       .createQueryBuilder()
       .update(Accounts)
       .set({ password: this.validator.encryptionPassword(password) })
-      .where('username = :email', { email })
+      .where('userName = :email', { email })
       .execute();
 
     const [account] = await Promise.all([
       this.accountsRepository.findOne({
         where: {
-          username: email,
+          userName: email,
         },
         relations: {
           users: true,
@@ -186,7 +186,7 @@ export class AuthService {
 
     if (account) {
       const token = await this.createAccessToken({
-        userName: account.username,
+        userName: account.userName,
         uuid: account.uuid,
         userId: account.users[0].id,
       });
@@ -213,7 +213,7 @@ export class AuthService {
     const newUuid = this.generator.uuid();
     const newAccount = this.accountsRepository.create({
       password: this.validator.encryptionPassword(password),
-      username: email,
+      userName: email,
       uuid: newUuid,
     });
 
@@ -229,7 +229,7 @@ export class AuthService {
     await this.usersRepository.save(newUser);
 
     const token = await this.createAccessToken({
-      userName: newAccount.username,
+      userName: newAccount.userName,
       uuid: newAccount.uuid,
       userId: newUser.id,
     });
@@ -241,7 +241,7 @@ export class AuthService {
     const { email = '', firstName = '', lastName = '' } = socialInterface;
     const account = await this.accountsRepository.findOne({
       where: {
-        username: socialInterface.email,
+        userName: socialInterface.email,
       },
       relations: {
         users: true,
@@ -250,7 +250,7 @@ export class AuthService {
 
     if (account) {
       const token = await this.createAccessToken({
-        userName: account.username,
+        userName: account.userName,
         uuid: account.uuid,
         userId: account.users[0].id,
       });
