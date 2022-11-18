@@ -66,8 +66,13 @@ export class PostController {
 
   @Delete(':id')
   @ApiAcceptedResponse({ type: ResponseSuccessDto })
-  async deletePost(@Param('id') id: Uuid): Promise<ResponseSuccessDto> {
-    return this.postService.deletePost(id);
+  async deletePost(@Param('id') id: Uuid): Promise<ResponseSuccessDto | null> {
+    try {
+      return this.postService.deletePost(id);
+    } catch (error) {
+      console.log('error', error);
+      return null;
+    }
   }
 }
 
@@ -83,7 +88,7 @@ export class PostPublicController {
     pageOptionsDto: PageOptionsDto,
     @GetSession() session: Session,
   ) {
-    return this.postService.getPostsPagination(pageOptionsDto, session.userId);
+    return this.postService.getPostsPagination(pageOptionsDto, session?.userId);
   }
 
   @Get(':id')
