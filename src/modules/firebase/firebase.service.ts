@@ -40,6 +40,7 @@ export class FirebaseService implements OnModuleInit {
   }
   async updateDescriptors(
     post_id: string,
+    user_id: number,
     photosIdRemoved?: string[],
     descriptorsUpdated?: FaceCollection['descriptors'],
   ) {
@@ -60,6 +61,7 @@ export class FirebaseService implements OnModuleInit {
       .doc(post_id)
       .set({
         post_id,
+        user_id,
         descriptors: [...filterDescriptors, ...(descriptorsUpdated || [])],
       });
   }

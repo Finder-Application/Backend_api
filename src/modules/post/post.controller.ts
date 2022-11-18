@@ -15,6 +15,7 @@ import { ApiAcceptedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PageOptionsDto } from 'common/dto/page-options.dto';
 
 import { ResponseSuccessDto } from 'common/dto/response.dto';
+import { RelevantNetworkPosts } from 'database/entities/RelevantNetworkPosts';
 import { Session } from 'interfaces/request';
 
 import { ApiPageOkResponse, Auth, GetSession } from '../../decorators';
@@ -32,15 +33,17 @@ export class PostController {
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: Array<PostResDto> })
-  async getRelevantPost(@Param('id') id: Uuid) {
+  async getRelevantPost(@Param('id') id: Uuid): Promise<PostResDto[]> {
     return this.postService.getPostRelevant(Number(id));
   }
 
   @Get('relevant-network/:id')
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: Array<PostResDto> })
-  async getRelevantNetwork(@Param('id') id: Uuid) {
+  @ApiOkResponse({ type: Array<RelevantNetworkPosts> })
+  async getRelevantNetwork(
+    @Param('id') id: Uuid,
+  ): Promise<RelevantNetworkPosts[]> {
     return this.postService.getPostRelevantNetwork(Number(id));
   }
   @Post()
@@ -52,24 +55,6 @@ export class PostController {
     @GetSession() session: Session,
   ) {
     return this.postService.createSinglePost(createPost, session.userId);
-  }
-
-  @Get()
-  @ApiPageOkResponse({ type: PostResDto })
-  getPostsPagination(
-    @Query(new ValidationPipe({ transform: true }))
-    pageOptionsDto: PageOptionsDto,
-    @GetSession() session: Session,
-  ) {
-    return this.postService.getPostsPagination(pageOptionsDto, session.userId);
-  }
-
-  @Get(':id')
-  @Auth({ public: false })
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: PostResDto })
-  async getSinglePost(@Param('id') id: Uuid) {
-    return this.postService.getSinglePost(id);
   }
 
   @Put(':id')
@@ -92,11 +77,20 @@ export class PostPublicController {
   constructor(private postService: PostService) {}
 
   @Get()
-  @ApiOkResponse({ type: PostResDto })
+  @ApiPageOkResponse({ type: PostResDto })
   getPostsPagination(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: PageOptionsDto,
+    @GetSession() session: Session,
   ) {
-    return this.postService.getPostsPagination(pageOptionsDto);
+    return this.postService.getPostsPagination(pageOptionsDto, session.userId);
+  }
+
+  @Get(':id')
+  @Auth({ public: false })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: PostResDto })
+  async getSinglePost(@Param('id') id: Uuid) {
+    return this.postService.getSinglePost(id);
   }
 }
