@@ -12,6 +12,12 @@ export class UserLoginDto {
   readonly password: string;
 }
 
+export class UserLoginGGDto {
+  @IsString()
+  @ApiProperty()
+  readonly idToken: string;
+}
+
 export class UserForgotPwDto {
   @IsString()
   @IsEmail()

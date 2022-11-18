@@ -1,5 +1,4 @@
 import {
-  ForbiddenException,
   Global,
   Injectable,
   NestMiddleware,
@@ -43,7 +42,9 @@ export class AuthMiddleware implements NestMiddleware {
         ...decode,
       };
     } catch (error) {
-      throw new ForbiddenException(`Signature verification raised: ${error}`);
+      throw new UnauthorizedException(
+        `Signature verification raised: ${error}`,
+      );
     }
 
     next();

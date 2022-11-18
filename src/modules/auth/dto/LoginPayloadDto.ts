@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
 import { UserDto } from '../../user/dtos/user.dto';
 import { TokenPayloadDto } from './TokenPayloadDto';
 
@@ -14,10 +13,4 @@ export class LoginPayloadDto {
     this.user = user;
     this.token = token;
   }
-}
-
-export class AuthGoogleLoginDto {
-  @ApiProperty({ example: 'abc' })
-  @IsNotEmpty()
-  idToken: string;
 }

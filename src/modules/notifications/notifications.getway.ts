@@ -2,16 +2,21 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { EVENT_REDIS, PUSH_NOTIFICATION } from 'constants/event-emit';
+import { CommentNotifications } from 'database/entities/CommentNotifications';
+import { PostNotifications } from 'database/entities/PostNotifications';
 import { Session } from 'interfaces/request';
 import { AuthService } from 'modules/auth/auth.service';
 import { Socket } from 'socket.io';
+import { Repository } from 'typeorm';
 import { NotificationPostDto } from './dtos/notification.dto';
 import { NotificationService } from './notifications.service';
 
@@ -29,6 +34,10 @@ export class NotificationGateway
     private authService: AuthService,
     private notificationService: NotificationService,
     @InjectRedis() private readonly redis: Redis,
+    @InjectRepository(CommentNotifications)
+    private comNotiRepository: Repository<CommentNotifications>,
+    @InjectRepository(PostNotifications)
+    private postNotiRepository: Repository<PostNotifications>,
   ) {
     this.listonEventPushNotification();
   }
@@ -73,6 +82,31 @@ export class NotificationGateway
     const nameRoom = this.getRoomNotify(userId);
     const { count } = await this.notificationService.countNotifications(userId);
     this.server.to(nameRoom).emit('take-total-notification', count);
+  }
+
+  @SubscribeMessage('seen-notification')
+  async handleSeenNotification(
+    client: Socket,
+    payload: { postId: number; type: 'post' | 'comment' },
+  ) {
+    const { userId } = (client.request as any).session as Session;
+    const { postId, type } = payload;
+
+    console.info('seen-notification', userId, payload);
+
+    await (type === 'post' ? this.postNotiRepository : this.comNotiRepository)
+      .createQueryBuilder()
+      .update()
+      .set({ seen: true })
+      .where('postId = :postId', { postId })
+      .execute();
+
+    // const { content, contents } = payload;
+    const nameRoom = this.getRoomNotify(userId);
+    // const dataSendToClient = { contents };
+
+    // push notification to ussr reduce total notification
+    this.server.to(nameRoom).emit('reduce-notification');
   }
 
   @OnEvent(PUSH_NOTIFICATION)

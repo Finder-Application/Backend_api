@@ -18,7 +18,7 @@ export class UserPublicDto {
   avatar?: string;
 
   @ApiPropertyOptional()
-  uuid?: string;
+  uuid?: number;
 
   @ApiPropertyOptional()
   phone?: string;
@@ -29,13 +29,13 @@ export class UserPublicDto {
   @ApiPropertyOptional()
   address?: string;
 
-  constructor(user?: Partial<Users>, uuid?: string, hasContact?: boolean) {
+  constructor(user?: Partial<Users>, hasContact?: boolean) {
     if (user) {
       this.firstName = user.firstName;
       this.lastName = user.lastName;
       this.middleName = user.middleName || '';
       this.avatar = user.avatar || '';
-      this.uuid = uuid ?? user.account?.uuid;
+      this.uuid = user.id;
       if (hasContact) {
         this.email = String(user.email);
         this.phone = String(user.phone);
@@ -62,8 +62,8 @@ export class UserDto extends UserPublicDto {
   @ApiPropertyOptional()
   isActive: boolean;
 
-  constructor(user: Users, uuid?: string) {
-    super(user, uuid);
+  constructor(user: Users) {
+    super(user);
     this.email = user.email || '';
     this.address = user.address || '';
     this.phone = user.phone || '';

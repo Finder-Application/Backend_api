@@ -11,11 +11,12 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { AuthService } from './auth.service';
 
-import { AuthGoogleLoginDto, LoginPayloadDto } from './dto/LoginPayloadDto';
+import { LoginPayloadDto } from './dto/LoginPayloadDto';
 import {
   UserChangePwDto,
   UserForgotPwDto,
   UserLoginDto,
+  UserLoginGGDto,
 } from './dto/UserLoginDto';
 import { UserRegisterDto } from './dto/UserRegisterDto';
 
@@ -36,14 +37,14 @@ export class AuthController {
     return this.authService.login(userLoginDto);
   }
 
-  @Post('login-gg')
+  @Post('login-gg1')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: LoginPayloadDto,
     description: 'User info with access token',
   })
   async userLoginGG(
-    @Body() loginDto: AuthGoogleLoginDto,
+    @Body() loginDto: UserLoginGGDto,
   ): Promise<LoginPayloadDto> {
     return this.authService.loginByGoogle(loginDto);
   }
