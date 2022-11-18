@@ -5,7 +5,7 @@ import { CreatePostDto } from './create-post.dto';
 export class PostDBDto extends Posts {
   constructor(post: CreatePostDto) {
     super();
-    this.gender = post.gender || null;
+    this.gender = Boolean(post.gender);
     this.fullName = post.fullName;
     this.hometownRegion = post.hometown?.region || null;
     this.hometownState = post.hometown?.state || null;
