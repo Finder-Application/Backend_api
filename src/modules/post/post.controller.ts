@@ -57,24 +57,6 @@ export class PostController {
     return this.postService.createSinglePost(createPost, session.userId);
   }
 
-  @Get()
-  @ApiPageOkResponse({ type: PostResDto })
-  getPostsPagination(
-    @Query(new ValidationPipe({ transform: true }))
-    pageOptionsDto: PageOptionsDto,
-    @GetSession() session: Session,
-  ) {
-    return this.postService.getPostsPagination(pageOptionsDto, session.userId);
-  }
-
-  @Get(':id')
-  @Auth({ public: false })
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ type: PostResDto })
-  async getSinglePost(@Param('id') id: Uuid) {
-    return this.postService.getSinglePost(id);
-  }
-
   @Put(':id')
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiAcceptedResponse()
@@ -95,11 +77,20 @@ export class PostPublicController {
   constructor(private postService: PostService) {}
 
   @Get()
-  @ApiOkResponse({ type: PostResDto })
+  @ApiPageOkResponse({ type: PostResDto })
   getPostsPagination(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: PageOptionsDto,
+    @GetSession() session: Session,
   ) {
-    return this.postService.getPostsPagination(pageOptionsDto);
+    return this.postService.getPostsPagination(pageOptionsDto, session.userId);
+  }
+
+  @Get(':id')
+  @Auth({ public: false })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: PostResDto })
+  async getSinglePost(@Param('id') id: Uuid) {
+    return this.postService.getSinglePost(id);
   }
 }

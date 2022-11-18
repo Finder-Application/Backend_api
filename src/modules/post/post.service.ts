@@ -146,10 +146,13 @@ export class PostService {
       throw new PostNotFoundException();
     }
     const { photos: newPhotos = [] } = dataUpdated;
+
+    const dataUpdatedDB = new PostDBDto(dataUpdated);
     const oldPhotos = currentPost.photos.split(',') || [];
     const photosUpdated = [...new Set([...oldPhotos, ...newPhotos])];
     const newData = this.postRepository.merge({
       ...currentPost,
+      ...dataUpdatedDB,
       photos: photosUpdated.join(','),
     });
     const { descriptors } = dataUpdated;
