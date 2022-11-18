@@ -146,13 +146,17 @@ export class PostService {
       throw new PostNotFoundException();
     }
     const { photos: newPhotos = [] } = dataUpdated;
-    const oldPhotos = currentPost.photos.split(',') || [];
-    const photosUpdated = [...new Set([...oldPhotos, ...newPhotos])];
+
+    const dataUpdatedDB = new PostDBDto(dataUpdated);
+    const photosUpdated = [...new Set(newPhotos)];
+
     const newData = this.postRepository.merge({
       ...currentPost,
+      ...dataUpdatedDB,
       photos: photosUpdated.join(','),
     });
     const { descriptors } = dataUpdated;
+
     const [postUpdated] = await Promise.all([
       this.postRepository.save(newData),
       this.firebase.updateDescriptors(
@@ -174,9 +178,11 @@ export class PostService {
     if (!postData) {
       throw new PostNotFoundException();
     }
+
     const [postRemoved] = await Promise.all([
-      this.postRepository.remove(postData),
-      this.firebase.deleteDescriptors(id),
+      queryBuilder.update({
+        isActive: false,
+      }),
     ]);
 
     return new ResponseSuccessDto('Delete post success', postRemoved);
