@@ -16,6 +16,7 @@ export class PostDBDto extends Posts {
     this.missingCommune = post.missingAddress?.commune || null;
     this.missingHamlet = post.missingAddress?.hamlet || null;
     this.missingRegion = post.missingAddress?.region || null;
+    this.missingState = post.missingAddress?.state || null;
     this.missingTime =
       (DateService.getOnlyDate(post.missingTime) as any) || null;
     this.photos = post.photos?.join(',') || '';
