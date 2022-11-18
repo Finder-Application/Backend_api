@@ -70,7 +70,7 @@ export class PostController {
     try {
       return this.postService.deletePost(id);
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return null;
     }
   }

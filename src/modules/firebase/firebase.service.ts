@@ -52,10 +52,11 @@ export class FirebaseService implements OnModuleInit {
       .collection(this.collection)
       .doc(post_id)
       .get();
-    const currentData = documents.data() as FaceCollection;
-    const filterDescriptors = currentData.descriptors.filter(descriptor =>
-      photosIdRemoved?.includes(descriptor.id),
-    );
+    const currentData = documents.data() as FaceCollection | undefined;
+    const filterDescriptors =
+      currentData?.descriptors.filter(descriptor =>
+        photosIdRemoved?.includes(descriptor.id),
+      ) || [];
     return await this.fireStore
       .collection(this.collection)
       .doc(post_id)

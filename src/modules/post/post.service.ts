@@ -156,6 +156,7 @@ export class PostService {
       photos: photosUpdated.join(','),
     });
     const { descriptors } = dataUpdated;
+
     const [postUpdated] = await Promise.all([
       this.postRepository.save(newData),
       this.firebase.updateDescriptors(
@@ -178,11 +179,11 @@ export class PostService {
       throw new PostNotFoundException();
     }
 
-    try {
-      const data = await queryBuilder.delete();
-    } catch (error) {
-      console.log('errrrrrrrrrrrrrrrr', error);
-    }
+    // try {
+    //   const data = await queryBuilder.delete();
+    // } catch (error) {
+    //   console.log('errrrrrrrrrrrrrrrr', error);
+    // }
 
     const [postRemoved] = await Promise.all([
       this.postRepository.delete({
