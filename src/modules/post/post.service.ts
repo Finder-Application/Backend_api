@@ -37,6 +37,7 @@ export class PostService {
     try {
       const queryBuilder = this.postRepository
         .createQueryBuilder('posts')
+        .where('posts.isActive = :isActive', { isActive: true })
         .leftJoinAndSelect('posts.user', 'user')
         .leftJoinAndSelect('user.account', 'account');
 
@@ -181,9 +182,14 @@ export class PostService {
     }
 
     const [postRemoved] = await Promise.all([
-      queryBuilder.update({
-        isActive: false,
-      }),
+      this.postRepository.update(
+        {
+          id: postData.id,
+        },
+        {
+          isActive: false,
+        },
+      ),
     ]);
 
     return new ResponseSuccessDto('Delete post success', postRemoved);
