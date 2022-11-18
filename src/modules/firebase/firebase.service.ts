@@ -54,7 +54,7 @@ export class FirebaseService implements OnModuleInit {
       .get();
     const currentData = documents.data() as FaceCollection | undefined;
     const filterDescriptors =
-      currentData?.descriptors.filter(descriptor =>
+      currentData?.descriptors?.filter(descriptor =>
         photosIdRemoved?.includes(descriptor.id),
       ) || [];
     return await this.fireStore
