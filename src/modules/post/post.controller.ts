@@ -58,6 +58,7 @@ export class PostController {
   }
 
   @Put(':id')
+  @Auth({ public: false })
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiAcceptedResponse()
   updatePost(@Param('id') id: Uuid, @Body() updatePostDto: UpdatePostDto) {
@@ -65,6 +66,7 @@ export class PostController {
   }
 
   @Delete(':id')
+  @Auth({ public: false })
   @ApiAcceptedResponse({ type: ResponseSuccessDto })
   async deletePost(@Param('id') id: Uuid): Promise<ResponseSuccessDto | null> {
     try {
