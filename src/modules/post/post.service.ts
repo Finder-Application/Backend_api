@@ -177,8 +177,17 @@ export class PostService {
     if (!postData) {
       throw new PostNotFoundException();
     }
+
+    try {
+      const data = await queryBuilder.delete();
+    } catch (error) {
+      console.log('errrrrrrrrrrrrrrrr', error);
+    }
+
     const [postRemoved] = await Promise.all([
-      this.postRepository.remove(postData),
+      this.postRepository.delete({
+        id: postData.id,
+      }),
       this.firebase.deleteDescriptors(id),
     ]);
 
