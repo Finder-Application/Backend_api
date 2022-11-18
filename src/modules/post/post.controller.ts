@@ -57,6 +57,30 @@ export class PostController {
     return this.postService.createSinglePost(createPost, session.userId);
   }
 
+  @Put(':id')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiAcceptedResponse()
+  updatePost(@Param('id') id: Uuid, @Body() updatePostDto: UpdatePostDto) {
+    return this.postService.updatePost(id, updatePostDto);
+  }
+
+  @Delete(':id')
+  @ApiAcceptedResponse({ type: ResponseSuccessDto })
+  async deletePost(@Param('id') id: Uuid): Promise<ResponseSuccessDto | null> {
+    try {
+      return this.postService.deletePost(id);
+    } catch (error) {
+      console.error('error', error);
+      return null;
+    }
+  }
+}
+
+@Controller('public/posts')
+@ApiTags('Posts API Public')
+export class PostPublicController {
+  constructor(private postService: PostService) {}
+
   @Get()
   @ApiPageOkResponse({ type: PostResDto })
   getPostsPagination(
@@ -73,33 +97,5 @@ export class PostController {
   @ApiOkResponse({ type: PostResDto })
   async getSinglePost(@Param('id') id: Uuid) {
     return this.postService.getSinglePost(id);
-  }
-
-  @Put(':id')
-  @HttpCode(HttpStatus.ACCEPTED)
-  @ApiAcceptedResponse()
-  updatePost(@Param('id') id: Uuid, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.updatePost(id, updatePostDto);
-  }
-
-  @Delete(':id')
-  @ApiAcceptedResponse({ type: ResponseSuccessDto })
-  async deletePost(@Param('id') id: Uuid): Promise<ResponseSuccessDto> {
-    return this.postService.deletePost(id);
-  }
-}
-
-@Controller('public/posts')
-@ApiTags('Posts API Public')
-export class PostPublicController {
-  constructor(private postService: PostService) {}
-
-  @Get()
-  @ApiOkResponse({ type: PostResDto })
-  getPostsPagination(
-    @Query(new ValidationPipe({ transform: true }))
-    pageOptionsDto: PageOptionsDto,
-  ) {
-    return this.postService.getPostsPagination(pageOptionsDto);
   }
 }
