@@ -65,7 +65,7 @@ export class PostService {
 
     const postEntity = await queryBuilder.getOne();
 
-    if (!postEntity) {
+    if (!postEntity || !postEntity.isActive) {
       throw new PostNotFoundException();
     }
 
@@ -103,6 +103,7 @@ export class PostService {
       const newPost = this.postRepository.create({
         ...new PostDBDto(postData),
         userId,
+        isActive: true,
       });
       const postCreated = await this.postRepository.save(newPost);
       if (!postCreated.id) {
@@ -190,7 +191,7 @@ export class PostService {
 
   async getPostRelevant(id: number): Promise<PostResDto[]> {
     const postData = await this.postRepository.findOne({
-      where: { id },
+      where: { id, isActive: true },
     });
     if (!postData) {
       throw new PostNotFoundException();
@@ -213,6 +214,7 @@ export class PostService {
     const posts = await this.postRepository.find({
       where: {
         id: In<number>(relevantPostsInfo.map(item => item.post_id)),
+        isActive: true,
       },
       relations: {
         user: true,
@@ -230,7 +232,7 @@ export class PostService {
 
   async getPostRelevantNetwork(id: number) {
     const postData = await this.postRepository.findOne({
-      where: { id },
+      where: { id, isActive: true },
       relations: {
         relevantNetworkPosts: true,
       },
