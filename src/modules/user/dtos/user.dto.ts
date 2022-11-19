@@ -18,7 +18,7 @@ export class UserPublicDto {
   avatar?: string;
 
   @ApiPropertyOptional()
-  uuid?: number;
+  userId?: number;
 
   @ApiPropertyOptional()
   phone?: string;
@@ -29,13 +29,17 @@ export class UserPublicDto {
   @ApiPropertyOptional()
   address?: string;
 
+  @ApiPropertyOptional()
+  gender?: boolean;
+
   constructor(user?: Partial<Users>, hasContact?: boolean) {
     if (user) {
       this.firstName = user.firstName;
       this.lastName = user.lastName;
       this.middleName = user.middleName || '';
       this.avatar = user.avatar || '';
-      this.uuid = user.id;
+      this.gender = Boolean(user.gender);
+      this.userId = user.id;
       if (hasContact) {
         this.email = String(user.email);
         this.phone = String(user.phone);

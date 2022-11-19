@@ -35,6 +35,9 @@ export class Users {
   @Column("tinyint", { name: "is_active", width: 1, default: () => "'1'" })
   isActive: boolean;
 
+  @Column("tinyint", { name: "gender", width: 1, default: () => "'1'" })
+  gender: boolean;
+
   @Column("varchar", {
     name: "avatar",
     nullable: true,

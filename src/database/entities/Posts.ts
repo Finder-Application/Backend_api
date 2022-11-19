@@ -40,6 +40,9 @@ export class Posts {
   @Column('tinyint', { name: 'isActive', width: 1 })
   isActive: boolean;
 
+  @Column('tinyint', { name: 'found', default: () => "'0'" })
+  found: boolean;
+
   @Column('int', { name: 'share_count', nullable: true, default: () => "'0'" })
   shareCount: number | null;
 
