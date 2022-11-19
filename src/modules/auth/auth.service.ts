@@ -10,23 +10,26 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Accounts } from 'database/entities/Accounts';
 import { Users } from 'database/entities/Users';
-import { OAuth2Client } from 'google-auth-library';
+import { Auth, google } from 'googleapis';
 import { ISocialInterface } from 'interfaces/social.interface';
 import { MailService } from 'modules/mail/mail.service';
 import { UserDto } from 'modules/user/dtos/user.dto';
 import { GeneratorService } from 'shared/services/generator.service';
 import { ValidatorService } from 'shared/services/validator.service';
 import { Repository } from 'typeorm';
-
 import { ApiConfigService } from '../../shared/services/api-config.service';
-import { AuthGoogleLoginDto, LoginPayloadDto } from './dto/LoginPayloadDto';
+import { LoginPayloadDto } from './dto/LoginPayloadDto';
 import { TokenPayloadDto } from './dto/TokenPayloadDto';
-import { UserChangePwDto, UserLoginDto } from './dto/UserLoginDto';
+import {
+  UserChangePwDto,
+  UserLoginDto,
+  UserLoginGGDto,
+} from './dto/UserLoginDto';
 import { UserRegisterDto } from './dto/UserRegisterDto';
 
 @Injectable()
 export class AuthService {
-  private google: OAuth2Client;
+  oauthClient: Auth.OAuth2Client;
 
   constructor(
     private jwtService: JwtService,
@@ -40,7 +43,7 @@ export class AuthService {
     @InjectRedis() private readonly redis: Redis,
     private mailService: MailService,
   ) {
-    this.google = new OAuth2Client(
+    this.oauthClient = new google.auth.OAuth2(
       this.configService.configGoogle.clientId,
       this.configService.configGoogle.clientSecret,
     );
@@ -81,32 +84,24 @@ export class AuthService {
         userId: account.users[0].id,
       });
 
-      return new LoginPayloadDto(
-        new UserDto(account.users[0], account.uuid),
-        token,
-      );
+      return new LoginPayloadDto(new UserDto(account.users[0]), token);
     }
 
     throw new NotFoundException('Your user name or password is invalid!');
   }
 
-  async loginByGoogle(loginDto: AuthGoogleLoginDto): Promise<LoginPayloadDto> {
-    const ticket = await this.google.verifyIdToken({
-      idToken: loginDto.idToken,
-      audience: [this.configService.configGoogle.clientId],
-    });
+  async loginByGoogle(loginDto: UserLoginGGDto): Promise<LoginPayloadDto> {
+    const ticket = await this.oauthClient.getTokenInfo(loginDto.idToken);
 
-    const data = ticket.getPayload();
-
-    if (!data) {
+    if (!ticket) {
       throw new BadRequestException('Your token google is invalid');
     }
 
     return this.handlerWithGoogle({
-      id: data.sub,
-      email: data.email,
-      firstName: data.given_name,
-      lastName: data.family_name,
+      id: ticket.sub || '',
+      email: ticket.email,
+      firstName: '',
+      lastName: ticket.email?.split('@')[0] || '',
     });
   }
 
@@ -191,10 +186,7 @@ export class AuthService {
         userId: account.users[0].id,
       });
 
-      return new LoginPayloadDto(
-        new UserDto(account.users[0], account.uuid),
-        token,
-      );
+      return new LoginPayloadDto(new UserDto(account.users[0]), token);
     }
     throw new InternalServerErrorException('Change password failed');
   }
@@ -234,7 +226,7 @@ export class AuthService {
       userId: newUser.id,
     });
 
-    return new LoginPayloadDto(new UserDto(newUser, newAccount.uuid), token);
+    return new LoginPayloadDto(new UserDto(newUser), token);
   }
 
   async handlerWithGoogle(socialInterface: ISocialInterface) {
@@ -255,10 +247,7 @@ export class AuthService {
         userId: account.users[0].id,
       });
 
-      return new LoginPayloadDto(
-        new UserDto(account.users[0], account.uuid),
-        token,
-      );
+      return new LoginPayloadDto(new UserDto(account.users[0]), token);
     }
 
     return this.createAccount({
