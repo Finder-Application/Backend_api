@@ -61,7 +61,7 @@ export class UserController {
 export class UserPublicController {
   constructor(private userService: UserService) {}
 
-  @Put('someOne/:id')
+  @Get('info/:id')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description: 'Get me',

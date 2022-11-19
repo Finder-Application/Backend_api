@@ -97,7 +97,7 @@ export class PostPublicController {
     pageOptionsDto: PageOptionsDto,
     @GetSession() session: Session,
   ) {
-    return this.postService.getPostsPagination(pageOptionsDto, session.userId);
+    return this.postService.getPostsPagination(pageOptionsDto, session?.userId);
   }
 
   @Get(':id')
