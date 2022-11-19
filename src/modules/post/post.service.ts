@@ -136,12 +136,14 @@ export class PostService {
   }
 
   async updatePost(
+    userId: number,
     id: string,
     dataUpdated: UpdatePostDto,
   ): Promise<PostResDto> {
     const currentPost = await this.postRepository.findOne({
       where: {
         id: id as unknown as number,
+        userId,
       },
     });
     if (!currentPost) {
@@ -171,10 +173,11 @@ export class PostService {
     return new PostResDto(postUpdated);
   }
 
-  async deletePost(id: Uuid): Promise<ResponseSuccessDto> {
+  async deletePost(user_id: number, id: Uuid): Promise<ResponseSuccessDto> {
     const queryBuilder = this.postRepository
       .createQueryBuilder('posts')
-      .where('posts.id = :id', { id });
+      .where('posts.id = :id', { id })
+      .where('posts.user_id= :user_id', { user_id });
 
     const postData = await queryBuilder.getOne();
     if (!postData) {

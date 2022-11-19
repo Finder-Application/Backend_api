@@ -61,16 +61,23 @@ export class PostController {
   @Auth({ public: false })
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiAcceptedResponse()
-  updatePost(@Param('id') id: Uuid, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.updatePost(id, updatePostDto);
+  updatePost(
+    @Param('id') id: Uuid,
+    @Body() updatePostDto: UpdatePostDto,
+    @GetSession() session: Session,
+  ) {
+    return this.postService.updatePost(session.userId, id, updatePostDto);
   }
 
   @Delete(':id')
   @Auth({ public: false })
   @ApiAcceptedResponse({ type: ResponseSuccessDto })
-  async deletePost(@Param('id') id: Uuid): Promise<ResponseSuccessDto | null> {
+  async deletePost(
+    @Param('id') id: Uuid,
+    @GetSession() session: Session,
+  ): Promise<ResponseSuccessDto | null> {
     try {
-      return this.postService.deletePost(id);
+      return this.postService.deletePost(session.userId, id);
     } catch (error) {
       console.error('error', error);
       return null;
