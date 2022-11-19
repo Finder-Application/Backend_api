@@ -29,12 +29,16 @@ export class UserPublicDto {
   @ApiPropertyOptional()
   address?: string;
 
+  @ApiPropertyOptional()
+  gender?: boolean;
+
   constructor(user?: Partial<Users>, uuid?: string, hasContact?: boolean) {
     if (user) {
       this.firstName = user.firstName;
       this.lastName = user.lastName;
       this.middleName = user.middleName || '';
       this.avatar = user.avatar || '';
+      this.gender = Boolean(user.gender);
       this.uuid = uuid ?? user.account?.uuid;
       if (hasContact) {
         this.email = String(user.email);
