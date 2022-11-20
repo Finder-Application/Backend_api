@@ -197,9 +197,9 @@ export class PostService {
     return new ResponseSuccessDto('Delete post success', postRemoved);
   }
 
-  async getPostRelevant(id: number): Promise<PostResDto[]> {
+  async getPostRelevant(userId: number, id: number): Promise<PostResDto[]> {
     const postData = await this.postRepository.findOne({
-      where: { id, isActive: true },
+      where: { id, isActive: true, userId },
     });
     if (!postData) {
       throw new PostNotFoundException();
@@ -232,7 +232,9 @@ export class PostService {
       post =>
         new PostRelevantResDto(
           post,
-          relevantPostsInfo.find(item => item.post_id === post.id)?.similar,
+          relevantPostsInfo.find(
+            item => Number(item.post_id) === Number(post.id),
+          )?.similar,
         ),
     );
   }
