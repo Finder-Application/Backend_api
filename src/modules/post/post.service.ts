@@ -5,7 +5,6 @@ import { PageDto } from 'common/dto/page.dto';
 import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { Posts } from 'database/entities/Posts';
 import { ServerError } from 'exceptions/server-errror.exceptions';
-import { isEmpty } from 'lodash';
 import { FirebaseService } from 'modules/firebase/firebase.service';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { In, Repository } from 'typeorm';
@@ -212,14 +211,13 @@ export class PostService {
 
     const relevantPostsInfo = relevantPosts
       .split(';')
-      .filter(item => !isEmpty(item))
-      .map(
-        item =>
-          JSON.parse(item) as {
-            post_id: number;
-            similar: number;
-          },
-      );
+      .filter(item => item.trim())
+      .map(item => {
+        return JSON.parse(item) as {
+          post_id: number;
+          similar: number;
+        };
+      });
     const posts = await this.postRepository.find({
       where: {
         id: In<number>(relevantPostsInfo.map(item => item.post_id)),
