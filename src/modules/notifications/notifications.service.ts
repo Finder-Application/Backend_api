@@ -55,11 +55,10 @@ export class NotificationService {
       .leftJoinAndSelect('comment.user', 'user')
       .where('comNotiRepository.userId = :userId', { userId });
 
-    console.info('queryBuilder', await queryBuilder.execute());
     const [items, pageMetaDto] = await queryBuilder.paginate(
       pageOptionsDto,
       e => new NotificationCmtDto(e),
-      'commentNotifications',
+      'comNotiRepository',
     );
 
     return items.toPageDto(pageMetaDto);
@@ -74,11 +73,10 @@ export class NotificationService {
       .leftJoinAndSelect('postNotiRepository.user', 'user')
       .where('postNotiRepository.userId = :userId', { userId });
 
-    console.info('queryBuilder', await queryBuilder.execute());
     const [items, pageMetaDto] = await queryBuilder.paginate(
       pageOptionsDto,
       e => new NotificationPostDto(e),
-      'postNotifications',
+      'postNotiRepository',
     );
 
     return items.toPageDto(pageMetaDto);

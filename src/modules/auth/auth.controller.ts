@@ -37,7 +37,7 @@ export class AuthController {
     return this.authService.login(userLoginDto);
   }
 
-  @Post('login-gg1')
+  @Post('login-gg')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: LoginPayloadDto,
