@@ -42,7 +42,11 @@ export class Posts {
   })
   relevantPosts: string | null;
 
-  @Column("int", { name: "share_count", nullable: true, default: () => "'0'" })
+  @Column('tinyint', { name: 'found', default: () => "'0'" })
+  found: boolean;
+
+  @Column('int', { name: 'share_count', nullable: true, default: () => "'0'" })
+
   shareCount: number | null;
 
   @Column("datetime", {
