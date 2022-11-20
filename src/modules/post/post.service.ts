@@ -192,6 +192,7 @@ export class PostService {
           isActive: false,
         },
       ),
+      this.firebase.deleteDescriptors(String(postData.id)),
     ]);
 
     return new ResponseSuccessDto('Delete post success', postRemoved);
