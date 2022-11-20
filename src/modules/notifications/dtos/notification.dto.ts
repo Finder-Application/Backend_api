@@ -14,6 +14,9 @@ export class NotificationCmtDto {
   content: string;
 
   @ApiProperty()
+  seen: boolean;
+
+  @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
@@ -26,6 +29,7 @@ export class NotificationCmtDto {
     this.id = cmtNoti.id;
     this.postId = cmtNoti.postId;
     this.content = cmtNoti.content;
+    this.seen = cmtNoti.seen;
     this.createdAt = cmtNoti.createdAt;
     this.updatedAt = cmtNoti.updatedAt;
     this.user = new UserPublicDto(cmtNoti.comment.user);
@@ -46,6 +50,9 @@ export class NotificationPostDto {
   title: string;
 
   @ApiProperty()
+  seen: boolean;
+
+  @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
@@ -59,6 +66,7 @@ export class NotificationPostDto {
     this.postId = postNoti.postId;
     this.content = postNoti.content;
     this.title = postNoti.title;
+    this.seen = postNoti.seen;
     this.createdAt = postNoti.createdAt;
     this.updatedAt = postNoti.updatedAt;
     this.user = new UserPublicDto(postNoti.user);

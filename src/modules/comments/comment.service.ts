@@ -22,26 +22,30 @@ export class CommentService {
   ) {}
 
   async createComment(createComment: CreateCommentDto, session: Session) {
-    const comment = createComment.repFor
-      ? this.subCommentsRepository.create({
-          content: createComment.content,
-          photo: createComment.photo,
-          userId: session.userId,
-          subFor: createComment.repFor,
-        })
-      : this.commentsRepository.create({
-          postId: createComment.postId,
-          content: createComment.content,
-          photo: createComment.photo,
-          userId: session.userId,
-        });
+    try {
+      const comment = createComment.repFor
+        ? this.subCommentsRepository.create({
+            content: createComment.content,
+            photo: createComment.photo,
+            userId: session.userId,
+            subFor: createComment.repFor,
+          })
+        : this.commentsRepository.create({
+            postId: createComment.postId,
+            content: createComment.content,
+            photo: createComment.photo,
+            userId: session.userId,
+          });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    createComment.repFor
-      ? await this.subCommentsRepository.save(comment)
-      : await this.commentsRepository.save(comment);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      createComment.repFor
+        ? await this.subCommentsRepository.save(comment)
+        : await this.commentsRepository.save(comment);
 
-    return comment;
+      return comment;
+    } catch (error) {
+      console.info(error);
+    }
   }
 
   async getPagination(pageOptionsDto: PageOptionsDto, postId: number) {

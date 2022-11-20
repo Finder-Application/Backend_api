@@ -87,26 +87,27 @@ export class NotificationGateway
   @SubscribeMessage('seen-notification')
   async handleSeenNotification(
     client: Socket,
-    payload: { postId: number; type: 'post' | 'comment' },
+    payload: { id: number; type: 'post' | 'comment' },
   ) {
     const { userId } = (client.request as any).session as Session;
-    const { postId, type } = payload;
+    const { id, type } = payload;
 
-    console.info('seen-notification', userId, payload);
-
-    await (type === 'post' ? this.postNotiRepository : this.comNotiRepository)
+    const value = await (type === 'post'
+      ? this.postNotiRepository
+      : this.comNotiRepository
+    )
       .createQueryBuilder()
       .update()
       .set({ seen: true })
-      .where('postId = :postId', { postId })
+      .where('id = :id', { id })
+      .andWhere('userId = :userId', { userId })
+      .andWhere('seen = false')
       .execute();
 
-    // const { content, contents } = payload;
-    const nameRoom = this.getRoomNotify(userId);
-    // const dataSendToClient = { contents };
-
-    // push notification to ussr reduce total notification
-    this.server.to(nameRoom).emit('reduce-notification');
+    if (value.affected) {
+      const nameRoom = this.getRoomNotify(userId);
+      this.server.to(nameRoom).emit('reduce-notification');
+    }
   }
 
   @OnEvent(PUSH_NOTIFICATION)
