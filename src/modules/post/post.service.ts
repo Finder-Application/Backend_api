@@ -213,12 +213,10 @@ export class PostService {
     const relevantPostsInfo = relevantPosts
       .split(';')
       .filter(item => item.trim())
-      .map(item => {
-        return JSON.parse(item) as {
+      .map(item => JSON.parse(item) as {
           post_id: number;
           similar: number;
-        };
-      });
+        });
     const posts = await this.postRepository.find({
       where: {
         id: In<number>(relevantPostsInfo.map(item => item.post_id)),
