@@ -192,14 +192,15 @@ export class PostService {
           isActive: false,
         },
       ),
+      this.firebase.deleteDescriptors(String(postData.id)),
     ]);
 
     return new ResponseSuccessDto('Delete post success', postRemoved);
   }
 
-  async getPostRelevant(id: number): Promise<PostResDto[]> {
+  async getPostRelevant(userId: number, id: number): Promise<PostResDto[]> {
     const postData = await this.postRepository.findOne({
-      where: { id, isActive: true },
+      where: { id, isActive: true, userId },
     });
     if (!postData) {
       throw new PostNotFoundException();
@@ -212,12 +213,10 @@ export class PostService {
     const relevantPostsInfo = relevantPosts
       .split(';')
       .filter(item => item.trim())
-      .map(item => {
-        return JSON.parse(item) as {
+      .map(item => JSON.parse(item) as {
           post_id: number;
           similar: number;
-        };
-      });
+        });
     const posts = await this.postRepository.find({
       where: {
         id: In<number>(relevantPostsInfo.map(item => item.post_id)),
@@ -232,7 +231,9 @@ export class PostService {
       post =>
         new PostRelevantResDto(
           post,
-          relevantPostsInfo.find(item => item.post_id === post.id)?.similar,
+          relevantPostsInfo.find(
+            item => Number(item.post_id) === Number(post.id),
+          )?.similar,
         ),
     );
   }

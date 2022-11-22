@@ -33,8 +33,11 @@ export class PostController {
   @Auth({ public: false })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: Array<PostResDto> })
-  async getRelevantPost(@Param('id') id: Uuid): Promise<PostResDto[]> {
-    return this.postService.getPostRelevant(Number(id));
+  async getRelevantPost(
+    @Param('id') id: Uuid,
+    @GetSession() session: Session,
+  ): Promise<PostResDto[]> {
+    return this.postService.getPostRelevant(session.userId, Number(id));
   }
 
   @Get('relevant-network/:id')

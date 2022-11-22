@@ -41,10 +41,10 @@ export class FirebaseService implements OnModuleInit {
   async updateDescriptors(
     post_id: string,
     user_id: number,
-    photosIdRemoved?: string[],
+    newPhotos: string[],
     descriptorsUpdated?: FaceCollection['descriptors'],
   ) {
-    if (!photosIdRemoved?.length && !descriptorsUpdated?.length) {
+    if (newPhotos.length === 0 && !descriptorsUpdated?.length) {
       return null;
     }
 
@@ -53,10 +53,10 @@ export class FirebaseService implements OnModuleInit {
       .doc(post_id)
       .get();
     const currentData = documents.data() as FaceCollection | undefined;
+
     const filterDescriptors =
-      currentData?.descriptors.filter(descriptor =>
-        photosIdRemoved?.includes(descriptor.id),
-      ) || [];
+      currentData?.descriptors.filter(descriptor => !newPhotos.includes(descriptor.id.trim())) || [];
+
     return await this.fireStore
       .collection(this.collection)
       .doc(post_id)
