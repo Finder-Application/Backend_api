@@ -81,4 +81,33 @@ export class NotificationService {
 
     return items.toPageDto(pageMetaDto);
   }
+
+  async createCommentNotification(
+    userId: number,
+    postId: number,
+    commentId: number,
+    content: string,
+  ) {
+    // create a new comment notification
+    const newCommentNotification = this.comNotiRepository.create({
+      userId,
+      postId,
+      commentId,
+      content,
+      seen: false,
+    });
+
+    await this.comNotiRepository.save(newCommentNotification);
+
+    const queryBuilder = await this.comNotiRepository
+      .createQueryBuilder('comNotiRepository')
+      .leftJoinAndSelect('comNotiRepository.comment', 'comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .where('comNotiRepository.id = :id', { id: newCommentNotification.id })
+      .getOne();
+
+    if (queryBuilder) {
+      return new NotificationCmtDto(queryBuilder);
+    }
+  }
 }

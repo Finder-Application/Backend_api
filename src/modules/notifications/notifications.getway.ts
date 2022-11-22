@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   OnGatewayConnection,
@@ -10,14 +10,20 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { EVENT_REDIS, PUSH_NOTIFICATION } from 'constants/event-emit';
+import { EVENT_REDIS, PUSH_NOTIFICATION_COMMENT } from 'constants/event-emit';
 import { CommentNotifications } from 'database/entities/CommentNotifications';
+import { Comments } from 'database/entities/Comments';
 import { PostNotifications } from 'database/entities/PostNotifications';
+import { Posts } from 'database/entities/Posts';
 import { Session } from 'interfaces/request';
 import { AuthService } from 'modules/auth/auth.service';
 import { Socket } from 'socket.io';
 import { Repository } from 'typeorm';
-import { NotificationPostDto } from './dtos/notification.dto';
+import {
+  NotificationPostDto,
+  TakeNotificationFormBot,
+  TakeNotificationFormCreateComment,
+} from './dtos/notification.dto';
 import { NotificationService } from './notifications.service';
 
 @UsePipes(new ValidationPipe())
@@ -34,6 +40,10 @@ export class NotificationGateway
     private authService: AuthService,
     private notificationService: NotificationService,
     @InjectRedis() private readonly redis: Redis,
+    @InjectRepository(Comments)
+    private commentsRepository: Repository<Comments>,
+    @InjectRepository(Posts)
+    private postRepository: Repository<Posts>,
     @InjectRepository(CommentNotifications)
     private comNotiRepository: Repository<CommentNotifications>,
     @InjectRepository(PostNotifications)
@@ -110,21 +120,150 @@ export class NotificationGateway
     }
   }
 
-  @OnEvent(PUSH_NOTIFICATION)
-  async handlePushNewNotification(payload: NotificationPostDto) {
-    // const { content, contents } = payload;
-    // const nameRoom = this.getRoomNotify(userId);
-    // const dataSendToClient = { contents };
-    // await this.server
-    //   .to(nameRoom)
-    //   .emit('take-notification', JSON.stringify(dataSendToClient));
+  @OnEvent(PUSH_NOTIFICATION_COMMENT)
+  async handlePushNewNotification(payload: TakeNotificationFormCreateComment) {
+    const {
+      commentId,
+      isReply,
+      postId,
+      userCreateComment: userCreateComment,
+    } = payload;
+
+    if (isReply) {
+      const [post, comment] = await Promise.all([
+        this.postRepository.findOne({
+          where: {
+            id: postId,
+          },
+          relations: ['user'],
+        }),
+        this.commentsRepository.findOne({
+          where: {
+            id: commentId,
+          },
+          relations: ['user'],
+        }),
+      ]);
+
+      if (!(post && comment)) {
+        return 0;
+      }
+
+      const userIdCreatePost = post.user.id;
+      const userIdCreateComment = comment.user.id;
+
+      // create comment notification for user create post and user create comment
+      const [commentNoti1, commentNoti2] = await Promise.all([
+        this.notificationService.createCommentNotification(
+          userIdCreatePost,
+          postId,
+          commentId,
+          `${userCreateComment.lastName} commented on your post`,
+        ),
+
+        this.notificationService.createCommentNotification(
+          userIdCreateComment,
+          postId,
+          commentId,
+          `${userCreateComment.lastName} reply on your post`,
+        ),
+      ]);
+
+      const nameRoom = this.getRoomNotify(userIdCreatePost);
+      const nameRoom2 = this.getRoomNotify(userIdCreateComment);
+
+      if (commentNoti1) {
+        this.server.to(nameRoom).emit(
+          'new-notification',
+          JSON.stringify({
+            type: 'comment',
+            data: commentNoti1,
+          }),
+        );
+        this.server.to(nameRoom).emit('increase-notification');
+      }
+
+      // push notification for user create comment
+
+      if (commentNoti2) {
+        this.server.to(nameRoom2).emit(
+          'new-notification',
+          JSON.stringify({
+            type: 'comment',
+            data: commentNoti2,
+          }),
+        );
+        this.server.to(nameRoom2).emit('increase-notification');
+      }
+    } else {
+      const post = await this.postRepository.findOne({
+        where: {
+          id: postId,
+        },
+        relations: ['user'],
+      });
+
+      if (!post) {
+        return 0;
+      }
+
+      const userIdCreatePost = post.user.id;
+      // create comment notification for user create post and user create comment
+      const [commentNoti1] = await Promise.all([
+        this.notificationService.createCommentNotification(
+          userIdCreatePost,
+          postId,
+          commentId,
+          `${userCreateComment.userName} commented on your post`,
+        ),
+      ]);
+
+      // push notification for user create post
+      const nameRoom = this.getRoomNotify(userIdCreatePost);
+
+      //   console.log(nameRoom);
+
+      if (commentNoti1) {
+        this.server.to(nameRoom).emit(
+          'new-notification',
+          JSON.stringify({
+            type: 'comment',
+            data: commentNoti1,
+          }),
+        );
+
+        this.server.to(nameRoom).emit('increase-notification');
+      }
+    }
+  }
+
+  async handler(client: Socket, payload: string) {
+    const { userId } = (client.request as any).session as Session;
+    const nameRoom = this.getRoomNotify(userId);
+
+    const parse = JSON.parse(payload) as TakeNotificationFormBot;
+
+    const queryBuilder = this.postNotiRepository
+      .createQueryBuilder('postNotiRepository')
+      .leftJoinAndSelect('postNotiRepository.user', 'user')
+      .where('postNotiRepository.userId = :userId', { userId })
+      .andWhere('postNotiRepository.postId = :postId', {
+        postId: parse.post_id,
+      })
+      .getOne();
+
+    const data = await queryBuilder;
+
+    if (data) {
+      const dataSendToClient = new NotificationPostDto(data);
+      this.server.to(nameRoom).emit(
+        'new-notification',
+        JSON.stringify({
+          type: 'post',
+          data: dataSendToClient,
+        }),
+      );
+      this.server.to(nameRoom).emit('increase-notification');
+    }
   }
 }
-
-// dumy data for test
-// channel NEW_INFO_POST {"id":381,"post_id":71,"seen":false,"content":"Title day ","user_id":1,"title":"Title day "}
-// channel NEW_INFO_POST {"id":383,"post_id":71,"seen":false,"content":"Title day ","user_id":1,"title":"Title day "}
-// channel NEW_INFO_POST {"id":382,"post_id":71,"seen":false,"content":"Title day ","user_id":1,"title":"Title day "}
-// channel NEW_INFO_POST {"id":384,"post_id":62,"seen":false,"content":"","user_id":1,"title":""}
-// channel NEW_INFO_POST {"id":385,"post_id":71,"seen":false,"content":"Title day ","user_id":1,"title":"Title day "}
-// channel NEW_INFO_POST {"id":386,"post_id":59,"seen":false,"content":"","user_id":1,"title":""}
