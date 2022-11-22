@@ -53,6 +53,7 @@ export class AuthService {
     userName: string;
     uuid: string;
     userId: number;
+    lastName: string;
   }): Promise<TokenPayloadDto> {
     return new TokenPayloadDto({
       expiresIn: this.configService.authConfig.jwtExpirationTime,
@@ -60,6 +61,7 @@ export class AuthService {
         userName: data.userName,
         uuid: data.uuid,
         userId: data.userId,
+        lastName: data.lastName,
       }),
     });
   }
@@ -82,6 +84,7 @@ export class AuthService {
         userName: account.userName,
         uuid: account.uuid,
         userId: account.users[0].id,
+        lastName: account.users[0].lastName,
       });
 
       return new LoginPayloadDto(new UserDto(account.users[0]), token);
@@ -184,6 +187,7 @@ export class AuthService {
         userName: account.userName,
         uuid: account.uuid,
         userId: account.users[0].id,
+        lastName: account.users[0].lastName,
       });
 
       return new LoginPayloadDto(new UserDto(account.users[0]), token);
@@ -224,6 +228,7 @@ export class AuthService {
       userName: newAccount.userName,
       uuid: newAccount.uuid,
       userId: newUser.id,
+      lastName: newUser.lastName,
     });
 
     return new LoginPayloadDto(new UserDto(newUser), token);
@@ -245,6 +250,7 @@ export class AuthService {
         userName: account.userName,
         uuid: account.uuid,
         userId: account.users[0].id,
+        lastName: account.users[0].lastName,
       });
 
       return new LoginPayloadDto(new UserDto(account.users[0]), token);

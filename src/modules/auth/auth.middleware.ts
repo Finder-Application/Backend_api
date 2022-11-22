@@ -26,6 +26,7 @@ export class AuthMiddleware implements NestMiddleware {
           userName: 'taccin03@gmail.com',
           uuid: '90e778d0-3c81-11ed-9c12-d93050488a69',
           userId: 1,
+          lastName: 'Cinny',
         };
       } else {
         let authHeader: string;

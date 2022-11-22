@@ -13,7 +13,7 @@ export class CreateCommentDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  repFor: number;
+  repFor?: number;
 
   @ApiProperty()
   @IsString()

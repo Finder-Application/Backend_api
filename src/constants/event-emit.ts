@@ -1,4 +1,4 @@
-export const PUSH_NOTIFICATION = 'pushNotification';
+export const PUSH_NOTIFICATION_COMMENT = 'PUSH_NOTIFICATION_COMMENT';
 
 export const EVENT_REDIS = {
   NEW_INFO_POST: 'NEW_INFO_POST',
