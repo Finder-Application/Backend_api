@@ -1,6 +1,7 @@
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthMiddleware } from 'modules/auth/auth.middleware';
 import { AuthModule } from 'modules/auth/auth.module';
@@ -37,6 +38,7 @@ import { ApiConfigService } from './shared/services/api-config.service';
 
       inject: [ApiConfigService],
     }),
+    EventEmitterModule.forRoot(),
     HealthCheckerModule,
     AuthModule,
     NotificationModule,

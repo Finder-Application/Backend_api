@@ -3,12 +3,15 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageOptionsDto } from 'common/dto/page-options.dto';
 import { ResponseSuccessDto } from 'common/dto/response.dto';
+import { PUSH_NOTIFICATION_COMMENT } from 'constants/event-emit';
 import { Comments } from 'database/entities/Comments';
 import { SubComments } from 'database/entities/SubComments';
 import { Session } from 'interfaces/request';
+import { TakeNotificationFormCreateComment } from 'modules/notifications/dtos/notification.dto';
 import { Repository } from 'typeorm';
 import { CommentDto, CommentIdDto, CreateCommentDto } from './dtos/comment.dto';
 
@@ -19,6 +22,7 @@ export class CommentService {
     private commentsRepository: Repository<Comments>,
     @InjectRepository(SubComments)
     private subCommentsRepository: Repository<SubComments>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createComment(createComment: CreateCommentDto, session: Session) {
@@ -37,10 +41,30 @@ export class CommentService {
             userId: session.userId,
           });
 
+      let userIdCreateCommentHead;
+      if (createComment.repFor) {
+        userIdCreateCommentHead = await this.commentsRepository.findOne({
+          where: {
+            id: createComment.repFor,
+          },
+        });
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      createComment.repFor
+      const createNewComment = createComment.repFor
         ? await this.subCommentsRepository.save(comment)
         : await this.commentsRepository.save(comment);
+
+      this.eventEmitter.emit(PUSH_NOTIFICATION_COMMENT, {
+        isReply:
+          createComment.repFor &&
+          userIdCreateCommentHead.userId !== session.userId
+            ? true
+            : false,
+        postId: createComment.postId,
+        commentId: createComment.repFor ?? createNewComment.id,
+        userCreateComment: session,
+      } as TakeNotificationFormCreateComment);
 
       return comment;
     } catch (error) {
