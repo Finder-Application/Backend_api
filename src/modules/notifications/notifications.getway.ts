@@ -121,6 +121,7 @@ export class NotificationGateway
   }
 
   @OnEvent(PUSH_NOTIFICATION_COMMENT)
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   async handlePushNewNotification(payload: TakeNotificationFormCreateComment) {
     const {
       commentId,
@@ -151,6 +152,36 @@ export class NotificationGateway
 
       const userIdCreatePost = post.user.id;
       const userIdCreateComment = comment.user.id;
+
+      if (userIdCreateComment !== userCreateComment.userId) {
+        return 0;
+      }
+
+      if (userIdCreatePost === userCreateComment.userId) {
+        const [commentNoti2] = await Promise.all([
+          this.notificationService.createCommentNotification(
+            userIdCreateComment,
+            postId,
+            commentId,
+            `${userCreateComment.lastName} reply on your post`,
+          ),
+        ]);
+
+        const nameRoom2 = this.getRoomNotify(userIdCreateComment);
+        // push notification for user create comment
+        if (commentNoti2) {
+          this.server.to(nameRoom2).emit(
+            'new-notification',
+            JSON.stringify({
+              type: 'comment',
+              data: commentNoti2,
+            }),
+          );
+          this.server.to(nameRoom2).emit('increase-notification');
+        }
+
+        return 0;
+      }
 
       // create comment notification for user create post and user create comment
       const [commentNoti1, commentNoti2] = await Promise.all([
@@ -208,6 +239,11 @@ export class NotificationGateway
       }
 
       const userIdCreatePost = post.user.id;
+
+      if (userIdCreatePost === userCreateComment.userId) {
+        return 0;
+      }
+
       // create comment notification for user create post and user create comment
       const [commentNoti1] = await Promise.all([
         this.notificationService.createCommentNotification(
