@@ -130,7 +130,7 @@ export class PostService {
         '🚀 ~ file: post.service.ts ~ line 125 ~ PostService ~ error',
         error,
       );
-      return new ServerError();
+      throw new ServerError();
     }
   }
 
@@ -173,12 +173,12 @@ export class PostService {
   }
 
   async deletePost(user_id: number, id: Uuid): Promise<ResponseSuccessDto> {
-    const queryBuilder = this.postRepository
-      .createQueryBuilder('posts')
-      .where('posts.id = :id', { id })
-      .where('posts.user_id= :user_id', { user_id });
-
-    const postData = await queryBuilder.getOne();
+    const postData = await this.postRepository.findOne({
+      where: {
+        userId: user_id,
+        id: Number(id),
+      },
+    });
     if (!postData) {
       throw new PostNotFoundException();
     }
@@ -213,10 +213,13 @@ export class PostService {
     const relevantPostsInfo = relevantPosts
       .split(';')
       .filter(item => item.trim())
-      .map(item => JSON.parse(item) as {
-          post_id: number;
-          similar: number;
-        });
+      .map(
+        item =>
+          JSON.parse(item) as {
+            post_id: number;
+            similar: number;
+          },
+      );
     const posts = await this.postRepository.find({
       where: {
         id: In<number>(relevantPostsInfo.map(item => item.post_id)),
