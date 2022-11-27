@@ -117,18 +117,19 @@ export class CommentService {
   }
 
   async countTotalComment(postId: number) {
+    // count all comment with postId from table comments and table subComments
     const totalComment = await this.commentsRepository
-      .createQueryBuilder()
-      .where('comments.postId = :postId', { postId })
-      .getCount();
 
-    const totalSubComment = await this.subCommentsRepository
-      .createQueryBuilder()
-      .where('subComments.postId = :postId', { postId })
-      .getCount();
+      .createQueryBuilder('comments')
+      .where('comments.postId = :postId', { postId })
+      .leftJoinAndSelect('comments.subComments', 'sub')
+      .getMany();
 
     return {
-      total: totalComment + totalSubComment,
+      total: totalComment.reduce(
+        (acc, cur) => acc + cur.subComments.length + 1,
+        0,
+      ),
     };
   }
 
