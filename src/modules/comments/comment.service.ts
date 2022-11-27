@@ -144,6 +144,9 @@ export class CommentService {
       throw new NotFoundException('Your comment not exit!!');
     }
 
-    return new ResponseSuccessDto('Delete comment success', { id });
+    return new ResponseSuccessDto('Delete comment success', {
+      id,
+      postId: findComment.raw[0].postId,
+    });
   }
 }
