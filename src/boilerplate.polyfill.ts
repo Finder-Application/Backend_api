@@ -178,7 +178,7 @@ SelectQueryBuilder.prototype.paginate = async function (
           break;
         }
       }
-      this.andWhere(`${nameTable}.${e.field} ${operatorSQL} (:value)`, {
+      this.orWhere(`${nameTable}.${e.field} ${operatorSQL} (:value)`, {
         value: e.value,
       });
     });
