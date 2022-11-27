@@ -15,7 +15,12 @@ import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { ApiPageOkResponse, GetSession } from 'decorators';
 import { Session } from 'interfaces/request';
 import { CommentService } from './comment.service';
-import { CommentDto, CommentIdDto, CreateCommentDto } from './dtos/comment.dto';
+import {
+  CommentDto,
+  CommentIdDto,
+  CreateCommentDto,
+  TotalComment,
+} from './dtos/comment.dto';
 
 @Controller('private/comments')
 @ApiTags('Comments Api')
@@ -57,5 +62,12 @@ export class CommentPublicController {
     pageOptionsDto: PageOptionsDto,
   ): Promise<any> {
     return this.commentService.getPagination(pageOptionsDto, postId.id);
+  }
+
+  // get count comment
+  @Get('count')
+  @ApiOkResponse({ type: TotalComment })
+  getCountComment(@Query() postId: CommentIdDto) {
+    return this.commentService.countTotalComment(postId.id);
   }
 }

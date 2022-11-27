@@ -114,3 +114,8 @@ export class CommentDto {
     this.updatedAt = comment.updatedAt;
   }
 }
+
+export class TotalComment {
+  @ApiProperty()
+  total: number;
+}

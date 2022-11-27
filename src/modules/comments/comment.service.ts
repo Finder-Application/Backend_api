@@ -116,6 +116,22 @@ export class CommentService {
     });
   }
 
+  async countTotalComment(postId: number) {
+    const totalComment = await this.commentsRepository
+      .createQueryBuilder()
+      .where('comments.postId = :postId', { postId })
+      .getCount();
+
+    const totalSubComment = await this.subCommentsRepository
+      .createQueryBuilder()
+      .where('subComments.postId = :postId', { postId })
+      .getCount();
+
+    return {
+      total: totalComment + totalSubComment,
+    };
+  }
+
   async deleteComment(id: number) {
     const findComment = await this.commentsRepository
       .createQueryBuilder()
