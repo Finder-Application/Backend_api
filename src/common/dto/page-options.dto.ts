@@ -145,7 +145,19 @@ export class PageOptionsDto {
   })
   readonly filter?: string;
 
-  @StringFieldOptional({})
+  @StringFieldOptional({
+    description: `
+    # How to use search
+
+    # It only work with Posts API
+
+    hihii i'm know you fu*k read it so i will not write it
+    but i give an example 
+    
+    ## search?: string;
+    ###{"search":"thanh","fields":["fullName"]}
+    `,
+  })
   @ApiProperty()
   readonly q?: string;
 
