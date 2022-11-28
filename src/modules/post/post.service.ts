@@ -44,6 +44,12 @@ export class PostService {
         queryBuilder.where('posts.userId = :userId', { userId });
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+
+      if (pageOptionsDto.q) {
+        queryBuilder.searchByString(pageOptionsDto.q, 'posts');
+      }
+
       const [items, pageMetaDto] = await queryBuilder.paginate(
         pageOptionsDto,
         e => new PostResDto(e),

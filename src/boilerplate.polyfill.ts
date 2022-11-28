@@ -38,7 +38,10 @@ declare global {
 declare module 'typeorm' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface QueryBuilder<Entity> {
-    searchByString(q: string, columnNames: string[]): this;
+    searchByString(
+      q: string,
+      tableName: string /*, columnNames: string[] */,
+    ): this;
   }
 
   interface SelectQueryBuilder<Entity> {
@@ -100,22 +103,33 @@ Array.prototype.toPageDto = function (pageMetaDto: PageMetaDto) {
   return new PageDto(this, pageMetaDto);
 };
 
-QueryBuilder.prototype.searchByString = function (q, columnNames) {
+QueryBuilder.prototype.searchByString = function (
+  q: string,
+  tableName: string /*columnNames*/,
+) {
   if (!q) {
     return this;
   }
 
-  this.andWhere(
-    new Brackets(qb => {
-      for (const item of columnNames) {
-        qb.orWhere(`${item} LIKE :q`);
-      }
-    }),
-  );
+  try {
+    const { fields, search } = JSON.parse(q) as {
+      search: string;
+      fields: string[];
+    };
+    this.andWhere(
+      new Brackets(qb => {
+        for (const item of fields) {
+          qb.orWhere(`${tableName}.${item} LIKE :q`);
+        }
+      }),
+    );
 
-  this.setParameter('q', `%${q}%`);
+    this.setParameter('q', `%${search}%`);
 
-  return this;
+    return this;
+  } catch (error) {
+    throw new BadRequestException(error.message);
+  }
 };
 
 SelectQueryBuilder.prototype.paginate = async function (
@@ -154,6 +168,10 @@ SelectQueryBuilder.prototype.paginate = async function (
     newFilter.forEach(e => {
       let operatorSQL = e.operator;
       switch (e.operator) {
+        case 'LIKE': {
+          operatorSQL = 'LIKE';
+          break;
+        }
         case 'EQUAL': {
           operatorSQL = '=';
           break;
@@ -178,9 +196,11 @@ SelectQueryBuilder.prototype.paginate = async function (
           break;
         }
       }
-      this.andWhere(`${nameTable}.${e.field} ${operatorSQL} (:value)`, {
-        value: e.value,
-      });
+
+      this.andWhere(`${nameTable}.${e.field} ${operatorSQL} '${e.value}'`);
+      // this.andWhere(`${nameTable}.${e.field} ${operatorSQL} ':value'`, {
+      //   value: e.value,
+      // });
     });
   }
 

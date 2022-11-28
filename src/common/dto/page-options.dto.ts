@@ -145,6 +145,10 @@ export class PageOptionsDto {
   })
   readonly filter?: string;
 
+  @StringFieldOptional({})
+  @ApiProperty()
+  readonly q?: string;
+
   get skip(): number {
     return (this.page - 1) * this.take;
   }
