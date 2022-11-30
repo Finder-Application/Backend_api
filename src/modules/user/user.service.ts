@@ -1,22 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToClass } from 'class-transformer';
-import { Accounts } from 'database/entities/Accounts';
 import { Users } from 'database/entities/Users';
+import { ServerError } from 'exceptions/server-errror.exceptions';
 import { NotFoundError } from 'rxjs';
 import type { FindOptionsWhere } from 'typeorm';
 import { Repository } from 'typeorm';
-import { Transactional } from 'typeorm-transactional-cls-hooked';
 
-import type { PageDto } from '../../common/dto/page.dto';
-import { FileNotImageException, UserNotFoundException } from '../../exceptions';
-import { IFile } from '../../interfaces';
 import { ValidatorService } from '../../shared/services/validator.service';
-import { UserRegisterDto } from '../auth/dto/UserRegisterDto';
-import { CreateSettingsDto } from './dtos/create-settings.dto';
 import { UserDto } from './dtos/user.dto';
-import type { UsersPageOptionsDto } from './dtos/users-page-options.dto';
 
 @Injectable()
 export class UserService {
@@ -42,6 +34,22 @@ export class UserService {
       return new UserDto(user);
     }
     throw new NotFoundError('User invalid');
+  }
+
+  async update(user_id: number, dataUpdate: Partial<Users>) {
+    try {
+      const user = await this.userRepository.save({
+        id: user_id,
+        ...dataUpdate,
+      });
+      return user;
+    } catch (error) {
+      console.error(
+        '🚀 ~ file: user.service.ts ~ line 59 ~ UserService ~ update ~ error',
+        error,
+      );
+      throw new ServerError();
+    }
   }
   //   async findByUsernameOrEmail(
   //     options: Partial<{ username: string; email: string }>,

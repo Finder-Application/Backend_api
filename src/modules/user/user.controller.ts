@@ -1,14 +1,19 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  Post,
   Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetSession } from 'decorators';
 import { Session } from 'interfaces/request';
+import { CommentIdDto } from './../comments/dtos/comment.dto';
+import { UserUpdateDto } from './dtos/user-update.dto';
+
 import { UserDto } from './dtos/user.dto';
 
 import { UserService } from './user.service';
@@ -27,6 +32,21 @@ export class UserController {
   })
   getMe(@GetSession() session: Session): Promise<UserDto> {
     return this.userService.findOne({ id: session.userId });
+  }
+  @Post('up-like')
+  upLikeOneComment(@Body() likeComment: CommentIdDto) {
+    console.log(
+      '🚀 ~ file: user.controller.ts:38 ~ UserController ~ upLikeOneComment ~ likeComment',
+      likeComment,
+    );
+  }
+
+  @Put('')
+  async updateUser(
+    @Body() body: UserUpdateDto,
+    @GetSession() session: Session,
+  ) {
+    return this.userService.update(session.userId, body);
   }
 
   //   @Get()
