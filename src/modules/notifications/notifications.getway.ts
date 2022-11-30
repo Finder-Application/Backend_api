@@ -151,40 +151,78 @@ export class NotificationGateway
       }
 
       const userIdCreatePost = post.user.id;
+
       const userIdCreateComment = comment.user.id;
 
-      if (userIdCreateComment !== userCreateComment.userId) {
+      const userIdCreateSubComment = userCreateComment.userId;
+
+      // case 1 use create subComment is user create post , is user create comment => not push notification
+      if (
+        userIdCreateComment === userIdCreateSubComment &&
+        userIdCreatePost === userIdCreateSubComment
+      ) {
         return 0;
       }
 
-      if (userIdCreatePost === userCreateComment.userId) {
-        const [commentNoti2] = await Promise.all([
-          this.notificationService.createCommentNotification(
+      // case 2 user create subComment is user create post => push notification to user create comment
+      if (userIdCreatePost === userIdCreateSubComment) {
+        const commentNotificationForUserCreateComment =
+          await this.notificationService.createCommentNotification(
             userIdCreateComment,
             postId,
             commentId,
             `${userCreateComment.lastName} reply on your post`,
-          ),
-        ]);
+          );
 
-        const nameRoom2 = this.getRoomNotify(userIdCreateComment);
+        const roomUserCreateComment = this.getRoomNotify(userIdCreateComment);
         // push notification for user create comment
-        if (commentNoti2) {
-          this.server.to(nameRoom2).emit(
+        if (commentNotificationForUserCreateComment) {
+          this.server.to(roomUserCreateComment).emit(
             'new-notification',
             JSON.stringify({
               type: 'comment',
-              data: commentNoti2,
+              data: commentNotificationForUserCreateComment,
             }),
           );
-          this.server.to(nameRoom2).emit('increase-notification');
+          this.server.to(roomUserCreateComment).emit('increase-notification');
         }
 
         return 0;
       }
 
-      // create comment notification for user create post and user create comment
-      const [commentNoti1, commentNoti2] = await Promise.all([
+      // case 3 user create subComment is user create comment => push notification to user create post
+      if (userIdCreateComment === userIdCreateSubComment) {
+        const commentNotificationForUserCreatePost =
+          await this.notificationService.createCommentNotification(
+            userIdCreatePost,
+            postId,
+            commentId,
+            `${userCreateComment.lastName} reply on your comment`,
+          );
+
+        const roomUserCreatePost = this.getRoomNotify(userIdCreatePost);
+        // push notification for user create comment
+        if (commentNotificationForUserCreatePost) {
+          this.server.to(roomUserCreatePost).emit(
+            'new-notification',
+            JSON.stringify({
+              type: 'comment',
+              data: commentNotificationForUserCreatePost,
+            }),
+          );
+          this.server.to(roomUserCreatePost).emit('increase-notification');
+        }
+
+        return 0;
+      }
+
+      // case 4 user create subComment is not user create post and user create comment
+      // => push notification to user create post and user create comment
+
+      const [
+        commentNotificationForUserCreatePost,
+        commentNotificationForUserCreateComment,
+      ] = await Promise.all([
         this.notificationService.createCommentNotification(
           userIdCreatePost,
           postId,
@@ -200,33 +238,33 @@ export class NotificationGateway
         ),
       ]);
 
-      const nameRoom = this.getRoomNotify(userIdCreatePost);
-      const nameRoom2 = this.getRoomNotify(userIdCreateComment);
+      const roomUserCreatePost = this.getRoomNotify(userIdCreatePost);
+      const roomUserCreateComment = this.getRoomNotify(userIdCreateComment);
 
-      if (commentNoti1) {
-        this.server.to(nameRoom).emit(
+      if (commentNotificationForUserCreatePost) {
+        this.server.to(roomUserCreatePost).emit(
           'new-notification',
           JSON.stringify({
             type: 'comment',
-            data: commentNoti1,
+            data: commentNotificationForUserCreatePost,
           }),
         );
-        this.server.to(nameRoom).emit('increase-notification');
+        this.server.to(roomUserCreatePost).emit('increase-notification');
       }
-
       // push notification for user create comment
-
-      if (commentNoti2) {
-        this.server.to(nameRoom2).emit(
+      if (commentNotificationForUserCreateComment) {
+        this.server.to(roomUserCreateComment).emit(
           'new-notification',
           JSON.stringify({
             type: 'comment',
-            data: commentNoti2,
+            data: commentNotificationForUserCreateComment,
           }),
         );
-        this.server.to(nameRoom2).emit('increase-notification');
+        this.server.to(roomUserCreateComment).emit('increase-notification');
       }
     } else {
+      // create comment notification for user create post
+
       const post = await this.postRepository.findOne({
         where: {
           id: postId,
@@ -245,19 +283,16 @@ export class NotificationGateway
       }
 
       // create comment notification for user create post and user create comment
-      const [commentNoti1] = await Promise.all([
-        this.notificationService.createCommentNotification(
+      const commentNoti1 =
+        await this.notificationService.createCommentNotification(
           userIdCreatePost,
           postId,
           commentId,
           `${userCreateComment.userName} commented on your post`,
-        ),
-      ]);
+        );
 
       // push notification for user create post
       const nameRoom = this.getRoomNotify(userIdCreatePost);
-
-      //   console.log(nameRoom);
 
       if (commentNoti1) {
         this.server.to(nameRoom).emit(
