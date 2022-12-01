@@ -5,28 +5,22 @@ export class UserUpdateDto {
   @ApiProperty({
     required: true,
   })
-  @IsString()
+  @ApiPropertyOptional()
   firstName: string;
 
   @ApiPropertyOptional()
   @IsString()
   middleName: string | null;
 
-  @ApiProperty({
-    required: true,
-  })
+  @ApiPropertyOptional()
   @IsString()
   lastName: string;
 
-  @ApiProperty({
-    required: true,
-  })
+  @ApiPropertyOptional()
   @IsBoolean()
   isActive: boolean;
 
-  @ApiProperty({
-    required: true,
-  })
+  @ApiPropertyOptional()
   @IsBoolean()
   gender: boolean;
 
@@ -39,20 +33,13 @@ export class UserUpdateDto {
   social: string | null;
 
   @IsString()
-  @ApiProperty({
-    required: true,
-  })
+  @ApiPropertyOptional()
   phone: string | null;
 
-  @IsString()
-  @ApiProperty({
-    required: true,
-  })
+  @ApiPropertyOptional()
   address: string | null;
 
-  @ApiProperty({
-    required: true,
-  })
+  @ApiPropertyOptional()
   @IsEmail()
   email: string | null;
 }
