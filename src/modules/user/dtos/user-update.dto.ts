@@ -2,10 +2,8 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsEmail, IsString } from 'class-validator';
 
 export class UserUpdateDto {
-  @ApiProperty({
-    required: true,
-  })
   @ApiPropertyOptional()
+  @IsString()
   firstName: string;
 
   @ApiPropertyOptional()
@@ -28,7 +26,7 @@ export class UserUpdateDto {
   @ApiProperty()
   avatar: string | null;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
   social: string | null;
 
