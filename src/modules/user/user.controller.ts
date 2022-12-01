@@ -33,21 +33,6 @@ export class UserController {
   getMe(@GetSession() session: Session): Promise<UserDto> {
     return this.userService.findOne({ id: session.userId });
   }
-  @Post('up-like')
-  upLikeOneComment(@Body() likeComment: CommentIdDto) {
-    console.log(
-      '🚀 ~ file: user.controller.ts:38 ~ UserController ~ upLikeOneComment ~ likeComment',
-      likeComment,
-    );
-  }
-
-  @Put('')
-  async updateUser(
-    @Body() body: UserUpdateDto,
-    @GetSession() session: Session,
-  ) {
-    return this.userService.update(session.userId, body);
-  }
 
   @Put('')
   async updateUser(
