@@ -3,42 +3,42 @@ import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 export class UserUpdateDto {
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsString()
   firstName: string;
 
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsString()
   middleName: string | null;
 
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsString()
   lastName: string;
 
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsString()
   isActive: boolean;
 
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsString()
   gender: boolean;
 
-  @IsNotEmpty()
+  @IsString()
   @ApiProperty()
   avatar: string | null;
 
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsString()
   social: string | null;
 
-  @IsNotEmpty()
+  @IsString()
   @ApiPropertyOptional()
   phone: string | null;
 
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsString()
   address: string | null;
 
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsString()
   email: string | null;
 }
