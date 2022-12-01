@@ -37,6 +37,7 @@ export class UserUpdateDto {
   phone: string | null;
 
   @ApiPropertyOptional()
+  @IsString()
   address: string | null;
 
   @ApiPropertyOptional()
