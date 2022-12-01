@@ -25,7 +25,7 @@ export class Posts {
   @Column('tinyint', { name: 'gender', nullable: true, width: 1 })
   gender: boolean | null;
 
-  @Column('varchar', { name: 'title', nullable: true, length: 200 })
+  @Column('varchar', { name: 'title', nullable: true, length: 500 })
   title: string | null;
 
   @Column('varchar', { name: 'relationship', nullable: true, length: 45 })
@@ -99,7 +99,7 @@ export class Posts {
   @Column('varchar', { name: 'missing_region', nullable: true, length: 200 })
   missingRegion: string | null;
 
-  @Column('varchar', { name: 'description', nullable: true, length: 500 })
+  @Column('varchar', { name: 'description', nullable: true, length: 2000 })
   description: string | null;
 
   @OneToMany(

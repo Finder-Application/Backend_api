@@ -49,6 +49,14 @@ export class UserController {
     return this.userService.update(session.userId, body);
   }
 
+  @Put('')
+  async updateUser(
+    @Body() body: UserUpdateDto,
+    @GetSession() session: Session,
+  ) {
+    return this.userService.update(session.userId, body);
+  }
+
   //   @Get()
   //   @Auth([RoleType.USER])
   //   @HttpCode(HttpStatus.OK)
