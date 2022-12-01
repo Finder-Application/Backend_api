@@ -134,19 +134,25 @@ export class CommentService {
   }
 
   async deleteComment(id: number) {
-    const findComment = await this.commentsRepository
+    const findComment = await this.commentsRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!findComment) {
+      throw new NotFoundException('Your comment not exit!!');
+    }
+
+    await this.commentsRepository
       .createQueryBuilder()
       .delete()
       .where('comments.id = :id', { id })
       .execute();
 
-    if (!findComment.affected) {
-      throw new NotFoundException('Your comment not exit!!');
-    }
-
     return new ResponseSuccessDto('Delete comment success', {
       id,
-      postId: findComment.raw[0].postId,
+      postId: findComment.postId,
     });
   }
 }
