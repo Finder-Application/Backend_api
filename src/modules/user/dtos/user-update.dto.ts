@@ -38,7 +38,9 @@ export class UserUpdateDto {
   @IsString()
   address: string | null;
 
-  @ApiPropertyOptional()
-  @IsEmail()
+  @ApiPropertyOptional({
+    required: false,
+  })
+  @IsString()
   email: string | null;
 }
