@@ -15,11 +15,11 @@ export class UserUpdateDto {
   lastName: string;
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsBoolean()
   isActive: boolean;
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsBoolean()
   gender: boolean;
 
   @IsString()
