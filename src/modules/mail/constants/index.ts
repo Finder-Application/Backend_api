@@ -1,4 +1,4 @@
-export const templateOtp = (otpCode: string) => `<div
+export const templateOtp = (otpCode: string, type: 'pw' | 'otp') => `<div
 style="
   min-width: 100%;
   width: 100% !important;
@@ -175,10 +175,9 @@ bgcolor="#e8e8e8"
                                   "
                                 >
                                   <b
-                                    >Your otp : ${otpCode}</b
+                                    > ${type==='otp'?'Your otp':'Your password'} : ${otpCode}</b
                                   >
                                   <br />
-                                  <p>Otp from Finder 😊</p>
                                 </p>
                               </td>
                             </tr>
