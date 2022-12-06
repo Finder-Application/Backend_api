@@ -171,7 +171,7 @@ export class NotificationGateway
             userIdCreateComment,
             postId,
             commentId,
-            `${userCreateComment.lastName} reply on your post`,
+            `${userCreateComment.lastName} reply on your comment`,
           );
 
         const roomUserCreateComment = this.getRoomNotify(userIdCreateComment);
@@ -197,7 +197,7 @@ export class NotificationGateway
             userIdCreatePost,
             postId,
             commentId,
-            `${userCreateComment.lastName} reply on your comment`,
+            `${userCreateComment.lastName} reply on your post`,
           );
 
         const roomUserCreatePost = this.getRoomNotify(userIdCreatePost);
@@ -234,7 +234,7 @@ export class NotificationGateway
           userIdCreateComment,
           postId,
           commentId,
-          `${userCreateComment.lastName} reply on your post`,
+          `${userCreateComment.lastName} reply on your comment`,
         ),
       ]);
 

@@ -201,9 +201,9 @@ export class AuthService {
   }
 
   async createAccount(
-    userRegisterDto: UserRegisterDto,
+    userRegisterDto: UserRegisterDto & { type?: 'google' },
   ): Promise<LoginPayloadDto> {
-    const { email, password, firstName, lastName, middleName } =
+    const { email, password, firstName, lastName, middleName, type } =
       userRegisterDto;
 
     const newUuid = this.generator.uuid();
@@ -230,6 +230,11 @@ export class AuthService {
       userId: newUser.id,
       lastName: newUser.lastName,
     });
+
+    if (type === 'google') {
+      //send mail new pw to user by mail
+      await this.mailService.sendPw(email, password);
+    }
 
     return new LoginPayloadDto(new UserDto(newUser), token);
   }
@@ -258,10 +263,11 @@ export class AuthService {
 
     return this.createAccount({
       email,
-      password: this.generator.uuid(),
+      password: this.generator.genPw(),
       firstName,
       lastName,
       middleName: '',
+      type: 'google',
     });
   }
 }

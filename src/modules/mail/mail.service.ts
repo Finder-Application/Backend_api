@@ -19,7 +19,18 @@ export class MailService {
     try {
       const to = mail;
       const subject = 'Otp code';
-      const html = templateOtp(otpCode);
+      const html = templateOtp(otpCode, 'otp');
+      await this.mailer.send(to, subject, html);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async sendPw(mail: string, pw: string) {
+    try {
+      const to = mail;
+      const subject = 'Your Password';
+      const html = templateOtp(pw, 'pw');
       await this.mailer.send(to, subject, html);
     } catch (error) {
       return error;
