@@ -55,8 +55,9 @@ export class NotificationGateway
   listonEventPushNotification() {
     this.redis.subscribe(EVENT_REDIS.NEW_INFO_POST).catch(() => null);
 
-    this.redis.on('message', (channel, message) => {
-      console.info('channel', channel, message);
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.redis.on('message', async (channel, message) => {
+      await this.handler(message as string);
     });
   }
 
@@ -77,8 +78,6 @@ export class NotificationGateway
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.pushTotalNotification(decode.userId);
-      // push total notification for user
-      // const count = await this.notificationService.countNotifications(decode.userId);
     } catch {
       client.disconnect();
     }
@@ -103,16 +102,20 @@ export class NotificationGateway
     const { id, type } = payload;
 
     const value = await (type === 'post'
-      ? this.postNotiRepository
-      : this.comNotiRepository
-    )
-      .createQueryBuilder()
-      .update()
-      .set({ seen: true })
-      .where('id = :id', { id })
-      .andWhere('userId = :userId', { userId })
-      .andWhere('seen = false')
-      .execute();
+      ? this.postNotiRepository.update(id, { seen: true })
+      : this.comNotiRepository.update(id, { seen: true }));
+
+    // const value = await (type === 'post'
+    //   ? this.postNotiRepository
+    //   : this.comNotiRepository
+    // )
+    //   .createQueryBuilder()
+    //   .update()
+    //   .set({ seen: true })
+    //   .where('id = :id', { id })
+    //   .andWhere('userId = :userId', { userId })
+    //   .andWhere('seen = false')
+    //   .execute();
 
     if (value.affected) {
       const nameRoom = this.getRoomNotify(userId);
@@ -308,16 +311,15 @@ export class NotificationGateway
     }
   }
 
-  async handler(client: Socket, payload: string) {
-    const { userId } = (client.request as any).session as Session;
-    const nameRoom = this.getRoomNotify(userId);
-
+  async handler(payload: string) {
     const parse = JSON.parse(payload) as TakeNotificationFormBot;
+
+    const nameRoom = this.getRoomNotify(parse.user_id);
 
     const queryBuilder = this.postNotiRepository
       .createQueryBuilder('postNotiRepository')
       .leftJoinAndSelect('postNotiRepository.user', 'user')
-      .where('postNotiRepository.userId = :userId', { userId })
+      .where('postNotiRepository.userId = :userId', { userId: parse.user_id })
       .andWhere('postNotiRepository.postId = :postId', {
         postId: parse.post_id,
       })
