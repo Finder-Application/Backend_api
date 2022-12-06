@@ -32,7 +32,7 @@ export class Posts {
   relationship: string | null;
 
   @Column('varchar', { name: 'photos', length: 2000 })
-  photos: string;
+  photos?: string;
 
   @Column('varchar', {
     name: 'relevant_posts',

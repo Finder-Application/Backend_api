@@ -27,7 +27,7 @@ export class PostResDto extends Posts {
     this.missingAddress.state = post.missingState;
     this.missingTime = post.missingTime;
     this.gender = post.gender;
-    this.photos = post.photos.split(',') as unknown as string;
+    this.photos = (post.photos?.split(',') || []) as unknown as string;
     this.owner = new UserPublicDto(post.user, hasContact);
   }
 }
