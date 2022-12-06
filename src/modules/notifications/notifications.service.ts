@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PageDto } from 'common/dto/page.dto';
 import { CommentNotifications } from 'database/entities/CommentNotifications';
 import { PostNotifications } from 'database/entities/PostNotifications';
+import { Posts } from 'database/entities/Posts';
 import { Users } from 'database/entities/Users';
 import { PostPageOptionsDto } from 'modules/post/dtos/post-page-options.dto';
 import { Repository } from 'typeorm';
@@ -21,6 +22,8 @@ export class NotificationService {
     private postNotiRepository: Repository<PostNotifications>,
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
+    @InjectRepository(Posts)
+    private postRepository: Repository<Posts>,
   ) {}
 
   //TODO: count all notification
@@ -79,7 +82,26 @@ export class NotificationService {
       'postNotiRepository',
     );
 
-    return items.toPageDto(pageMetaDto);
+    const itemsConverted = await Promise.all(
+      items.map(async item => {
+        const { photos } = (await this.postRepository.findOne({
+          where: {
+            id: item.postId,
+            isActive: true,
+            userId: item.userId,
+          },
+          select: {
+            photos: true,
+          },
+        })) || { photos: '' };
+
+        return {
+          ...item,
+          photo: photos?.split(',')[0],
+        };
+      }),
+    );
+    return itemsConverted.toPageDto(pageMetaDto);
   }
 
   async createCommentNotification(
