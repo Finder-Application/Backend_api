@@ -101,23 +101,24 @@ export class NotificationGateway
     const { userId } = (client.request as any).session as Session;
     const { id, type } = payload;
 
+    const checkBeforeUpdate = await (type === 'post'
+      ? this.postNotiRepository
+      : this.comNotiRepository
+    ).findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (checkBeforeUpdate?.seen) {
+      return;
+    }
+
     const value = await (type === 'post'
       ? this.postNotiRepository.update(id, { seen: true })
       : this.comNotiRepository.update(id, { seen: true }));
 
-    // const value = await (type === 'post'
-    //   ? this.postNotiRepository
-    //   : this.comNotiRepository
-    // )
-    //   .createQueryBuilder()
-    //   .update()
-    //   .set({ seen: true })
-    //   .where('id = :id', { id })
-    //   .andWhere('userId = :userId', { userId })
-    //   .andWhere('seen = false')
-    //   .execute();
-
-    if (value.affected ) {
+    if (value.affected) {
       const nameRoom = this.getRoomNotify(userId);
       this.server.to(nameRoom).emit('reduce-notification');
     }
