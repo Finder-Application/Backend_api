@@ -117,7 +117,7 @@ export class NotificationGateway
     //   .andWhere('seen = false')
     //   .execute();
 
-    if (value.affected) {
+    if (value?.raw?.[0]) {
       const nameRoom = this.getRoomNotify(userId);
       this.server.to(nameRoom).emit('reduce-notification');
     }
