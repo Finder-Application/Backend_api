@@ -72,6 +72,7 @@ export class NotificationGateway
     try {
       const decode = this.authService.validateJwt(token || '') as Session;
       const nameRoom = this.getRoomNotify(decode.userId);
+      // rome-ignore lint/suspicious/noExplicitAny: <explanation>
       (client.request as any).session = decode;
 
       await client.join(nameRoom);
@@ -98,6 +99,7 @@ export class NotificationGateway
     client: Socket,
     payload: { id: number; type: 'post' | 'comment' },
   ) {
+    // rome-ignore lint/suspicious/noExplicitAny: <explanation>
     const { userId } = (client.request as any).session as Session;
     const { id, type } = payload;
 

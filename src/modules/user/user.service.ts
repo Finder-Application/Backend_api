@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Accounts } from 'database/entities/Accounts';
 import { Users } from 'database/entities/Users';
 import { ServerError } from 'exceptions/server-errror.exceptions';
+import { LoginPayloadDto } from 'modules/auth/dto/LoginPayloadDto';
+import { TokenPayloadDto } from 'modules/auth/dto/TokenPayloadDto';
 import { NotFoundError } from 'rxjs';
+import { ApiConfigService } from 'shared/services/api-config.service';
 import type { FindOptionsWhere } from 'typeorm';
 import { Repository } from 'typeorm';
 
@@ -15,8 +19,11 @@ export class UserService {
   constructor(
     @InjectRepository(Users)
     private userRepository: Repository<Users>,
-    private validatorService: ValidatorService,
-    private commandBus: CommandBus,
+    @InjectRepository(Accounts)
+    private accountsRepository: Repository<Accounts>,
+    private configService: ApiConfigService,
+    private validator: ValidatorService,
+    private jwtService: JwtService,
   ) {}
 
   //   /**
@@ -38,11 +45,10 @@ export class UserService {
 
   async update(user_id: number, dataUpdate: Partial<Users>) {
     try {
-      const user = await this.userRepository.save({
+      return await this.userRepository.save({
         id: user_id,
         ...dataUpdate,
       });
-      return user;
     } catch (error) {
       console.error(
         '🚀 ~ file: user.service.ts ~ line 59 ~ UserService ~ update ~ error',
@@ -50,6 +56,55 @@ export class UserService {
       );
       throw new ServerError();
     }
+  }
+
+  async createAccessToken(data: {
+    userName: string;
+    uuid: string;
+    userId: number;
+    lastName: string;
+  }): Promise<TokenPayloadDto> {
+    return new TokenPayloadDto({
+      expiresIn: this.configService.authConfig.jwtExpirationTime,
+      accessToken: await this.jwtService.signAsync({
+        userName: data.userName,
+        uuid: data.uuid,
+        userId: data.userId,
+        lastName: data.lastName,
+      }),
+    });
+  }
+
+  async changePw(uuid: string, password: string) {
+    await this.accountsRepository
+      .createQueryBuilder()
+      .update(Accounts)
+      .set({ password: this.validator.encryptionPassword(password) })
+      .where('uuid = :uuid', { uuid })
+      .execute();
+
+    const [account] = await Promise.all([
+      this.accountsRepository.findOne({
+        where: {
+          uuid,
+        },
+        relations: {
+          users: true,
+        },
+      }),
+    ]);
+
+    if (account) {
+      const token = await this.createAccessToken({
+        userName: account.userName,
+        uuid: account.uuid,
+        userId: account.users[0].id,
+        lastName: account.users[0].lastName,
+      });
+
+      return new LoginPayloadDto(new UserDto(account.users[0]), token);
+    }
+    throw new InternalServerErrorException('Change password failed');
   }
   //   async findByUsernameOrEmail(
   //     options: Partial<{ username: string; email: string }>,

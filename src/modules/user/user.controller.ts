@@ -5,13 +5,13 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  Post,
   Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetSession } from 'decorators';
 import { Session } from 'interfaces/request';
-import { CommentIdDto } from './../comments/dtos/comment.dto';
+import { LoginPayloadDto } from 'modules/auth/dto/LoginPayloadDto';
+import { ChangePwPayloadDto } from './dtos/change-pw.dto';
 import { UserUpdateDto } from './dtos/user-update.dto';
 
 import { UserDto } from './dtos/user.dto';
@@ -42,31 +42,18 @@ export class UserController {
     return this.userService.update(session.userId, body);
   }
 
-  //   @Get()
-  //   @Auth([RoleType.USER])
-  //   @HttpCode(HttpStatus.OK)
-  //   @ApiPageOkResponse({
-  //     description: "Get users list",
-  //     type: PageDto,
-  //   })
-  //   getUsers(
-  //     @Query(new ValidationPipe({ transform: true }))
-  //     pageOptionsDto: UsersPageOptionsDto
-  //   ): Promise<PageDto<UserDto>> {
-  //     return this.userService.getUsers(pageOptionsDto);
-  //   }
-
-  //   @Get(":id")
-  //   @Auth([RoleType.USER])
-  //   @HttpCode(HttpStatus.OK)
-  //   @ApiResponse({
-  //     status: HttpStatus.OK,
-  //     description: "Get users list",
-  //     type: UserDto,
-  //   })
-  //   getUser(@UUIDParam("id") userId: Uuid): Promise<UserDto> {
-  //     return this.userService.getUser(userId);
-  //   }
+  @Put('change-pw')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    type: ChangePwPayloadDto,
+    description: 'User info with access token',
+  })
+  async userChangePw(
+    @Body() changePw: ChangePwPayloadDto,
+    @GetSession() session: Session,
+  ): Promise<LoginPayloadDto> {
+    return this.userService.changePw(session.uuid, changePw.pw);
+  }
 }
 
 @ApiTags('users public')
