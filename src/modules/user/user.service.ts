@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accounts } from 'database/entities/Accounts';
@@ -75,36 +79,46 @@ export class UserService {
     });
   }
 
-  async changePw(uuid: string, password: string) {
-    await this.accountsRepository
-      .createQueryBuilder()
-      .update(Accounts)
-      .set({ password: this.validator.encryptionPassword(password) })
-      .where('uuid = :uuid', { uuid })
-      .execute();
+  async changePw(uuid: string, password: string, oldPassword: string) {
+    const account = await this.accountsRepository.findOne({
+      where: {
+        uuid,
+      },
+    });
 
-    const [account] = await Promise.all([
-      this.accountsRepository.findOne({
-        where: {
-          uuid,
-        },
-        relations: {
-          users: true,
-        },
-      }),
-    ]);
+    if (account && this.validator.comparePw(account.password, oldPassword)) {
+      await this.accountsRepository
+        .createQueryBuilder()
+        .update(Accounts)
+        .set({ password: this.validator.encryptionPassword(password) })
+        .where('uuid = :uuid', { uuid })
+        .execute();
 
-    if (account) {
-      const token = await this.createAccessToken({
-        userName: account.userName,
-        uuid: account.uuid,
-        userId: account.users[0].id,
-        lastName: account.users[0].lastName,
-      });
+      const [accountReturn] = await Promise.all([
+        this.accountsRepository.findOne({
+          where: {
+            uuid,
+          },
+          relations: {
+            users: true,
+          },
+        }),
+      ]);
 
-      return new LoginPayloadDto(new UserDto(account.users[0]), token);
+      if (accountReturn) {
+        const token = await this.createAccessToken({
+          userName: accountReturn.userName,
+          uuid: accountReturn.uuid,
+          userId: accountReturn.users[0].id,
+          lastName: accountReturn.users[0].lastName,
+        });
+
+        return new LoginPayloadDto(new UserDto(accountReturn.users[0]), token);
+      }
+      throw new InternalServerErrorException('Change password failed');
     }
-    throw new InternalServerErrorException('Change password failed');
+
+    throw new NotFoundException('Your old password is invalid!');
   }
   //   async findByUsernameOrEmail(
   //     options: Partial<{ username: string; email: string }>,

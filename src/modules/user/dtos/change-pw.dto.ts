@@ -5,4 +5,8 @@ export class ChangePwPayloadDto {
   @IsString()
   @ApiProperty()
   pw: string;
+
+  @IsString()
+  @ApiProperty()
+  oldPw: string;
 }

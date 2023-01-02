@@ -52,7 +52,7 @@ export class UserController {
     @Body() changePw: ChangePwPayloadDto,
     @GetSession() session: Session,
   ): Promise<LoginPayloadDto> {
-    return this.userService.changePw(session.uuid, changePw.pw);
+    return this.userService.changePw(session.uuid, changePw.pw ,changePw.oldPw);
   }
 }
 
