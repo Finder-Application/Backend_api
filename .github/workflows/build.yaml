@@ -40,4 +40,4 @@ jobs:
           script_stop: true
           script: |
             cd build
-            ls
+            docker-compose down
