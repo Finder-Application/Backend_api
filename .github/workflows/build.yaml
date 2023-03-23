@@ -40,4 +40,4 @@ jobs:
           script_stop: true
           script: |
             cd build
-            docker-compose down
+            docker-compose up reverse-proxy web-ui
