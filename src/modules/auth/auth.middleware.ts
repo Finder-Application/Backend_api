@@ -4,7 +4,7 @@ import {
   NestMiddleware,
   UnauthorizedException,
 } from '@nestjs/common';
-import { NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import { RequestCustom } from 'interfaces/request';
 import { ApiConfigService } from 'shared/services/api-config.service';
 import { AuthService } from './auth.service';
@@ -17,7 +17,7 @@ export class AuthMiddleware implements NestMiddleware {
     private configService: ApiConfigService,
   ) {}
 
-  use(req: RequestCustom, res: Response, next: NextFunction) {
+  use(req: RequestCustom, res, next: NextFunction) {
     try {
       let decode: RequestCustom['session'];
 

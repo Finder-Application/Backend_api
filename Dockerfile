@@ -1,34 +1,106 @@
-FROM node:lts AS dist
-COPY package.json yarn.lock ./
 
-RUN yarn install --network-timeout 1000000
+# ###################
+# # BUILD FOR LOCAL DEVELOPMENT
+# ###################
 
-RUN rm -rf tsconfig.build.tsbuildinfo
+# FROM --platform=linux/amd64 node:16-alpine AS development
+# RUN npm install -g pnpm
+# # RUN apk add python3 make g++
+# # # Set environment variable for Python
+# # ENV PYTHON /usr/bin/python3
 
-COPY . ./
+# WORKDIR /usr/src/app
 
-RUN yarn build
+# COPY --chown=node:node pnpm-lock.yaml ./
 
-RUN rm -rf tsconfig.build.tsbuildinfo
+# RUN pnpm fetch --prod
 
-FROM node:lts AS node_modules
-COPY package.json yarn.lock ./
+# COPY --chown=node:node . .
+# RUN pnpm install
 
-RUN yarn install --prod --network-timeout 1000000
+# USER node
 
-FROM node:lts
+# ###################
+# # BUILD FOR PRODUCTION
+# ###################
 
-ARG PORT=3000
+# FROM --platform=linux/amd64 node:16-alpine As build
+# WORKDIR /usr/src/app
 
-RUN mkdir -p /usr/src/app
+# COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
+
+# COPY --chown=node:node . .
+
+# RUN npm run build
+
+# ENV NODE_ENV production
+
+# USER node
+
+# ###################
+# # PRODUCTION
+# ###################
+
+# FROM --platform=linux/amd64 node:16-alpine As production
+
+# COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
+# COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+
+# CMD [ "node", "dist/main.js" ]
+
+
+
+
+
+###################
+# BUILD FOR LOCAL DEVELOPMENT
+###################
+
+FROM --platform=linux/amd64 node:16-alpine As development
+RUN npm install -g pnpm
 
 WORKDIR /usr/src/app
 
-COPY --from=dist dist /usr/src/app/dist
-COPY --from=node_modules node_modules /usr/src/app/node_modules
+COPY --chown=node:node pnpm-lock.yaml ./
 
-COPY . /usr/src/app
+RUN pnpm fetch --prod
 
-EXPOSE $PORT
+COPY --chown=node:node . .
+RUN pnpm install
 
-CMD [ "yarn", "start:prod" ]
+USER node
+
+###################
+# BUILD FOR PRODUCTION
+###################
+
+FROM --platform=linux/amd64 node:16-alpine As build
+RUN npm install -g pnpm
+
+WORKDIR /usr/src/app
+
+COPY --chown=node:node pnpm-lock.yaml ./
+
+COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
+
+COPY --chown=node:node . .
+
+RUN pnpm build
+
+ENV NODE_ENV production
+
+RUN pnpm install --prod
+
+USER node
+
+###################
+# PRODUCTION
+###################
+
+FROM --platform=linux/amd64 node:16-alpine As production
+
+COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+
+CMD [ "node", "dist/main.js" ]
+

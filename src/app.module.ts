@@ -12,7 +12,6 @@ import { UserModule } from 'modules/user/user.module';
 import { UtilModule } from 'modules/utils/util.module';
 import { SharedModule } from 'shared/shared.module';
 import './boilerplate.polyfill';
-import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 
 @Module({
@@ -39,7 +38,6 @@ import { ApiConfigService } from './shared/services/api-config.service';
       inject: [ApiConfigService],
     }),
     EventEmitterModule.forRoot(),
-    HealthCheckerModule,
     AuthModule,
     NotificationModule,
     UserModule,

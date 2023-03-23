@@ -5,7 +5,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
-import { Transport } from '@nestjs/microservices';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import compression from 'compression';
@@ -13,10 +12,6 @@ import { middleware as expressCtx } from 'express-ctx';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import {
-  initializeTransactionalContext,
-  patchTypeORMRepositoryWithBaseRepository,
-} from 'typeorm-transactional-cls-hooked';
 
 import { json } from 'body-parser';
 import { AppModule } from './app.module';
@@ -26,9 +21,7 @@ import { setupSwagger } from './setup-swagger';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { SharedModule } from './shared/shared.module';
 
-export async function bootstrap(): Promise<NestExpressApplication> {
-  initializeTransactionalContext();
-  patchTypeORMRepositoryWithBaseRepository();
+export const bootstrap = async (): Promise<NestExpressApplication> => {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
     new ExpressAdapter(),
@@ -71,20 +64,6 @@ export async function bootstrap(): Promise<NestExpressApplication> {
 
   const configService = app.select(SharedModule).get(ApiConfigService);
 
-  // only start nats if it is enabled
-  if (configService.natsEnabled) {
-    const natsConfig = configService.natsConfig;
-    app.connectMicroservice({
-      transport: Transport.NATS,
-      options: {
-        url: `nats://${natsConfig.host}:${natsConfig.port}`,
-        queue: 'main_service',
-      },
-    });
-
-    await app.startAllMicroservices();
-  }
-
   if (configService.documentationEnabled) {
     setupSwagger(app);
   }
@@ -103,6 +82,6 @@ export async function bootstrap(): Promise<NestExpressApplication> {
   console.info(`Documentation: http://localhost:${process.env.PORT}/api/docs`);
 
   return app;
-}
+};
 
 void bootstrap();

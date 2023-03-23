@@ -30,7 +30,6 @@ import _ from 'lodash';
 import { supportedLanguageCount } from '../constants';
 import { ApiEnumProperty, ApiUUIDProperty } from './property.decorators';
 import {
-  PhoneNumberSerializer,
   ToArray,
   ToBoolean,
   ToLowerCase,
@@ -307,7 +306,7 @@ export function PhoneField(
   options: Omit<ApiPropertyOptions, 'type'> &
     Partial<{ swagger: boolean }> = {},
 ): PropertyDecorator {
-  const decorators = [IsPhoneNumber(), PhoneNumberSerializer()];
+  const decorators = [IsPhoneNumber()];
 
   if (options.swagger !== false) {
     decorators.push(ApiProperty({ type: String, ...options }));

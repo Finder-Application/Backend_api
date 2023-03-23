@@ -2,7 +2,6 @@ import { HttpModule } from '@nestjs/axios';
 import { Global, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-// import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { MailModule } from 'modules/mail/mail.module';
 import { MailService } from 'modules/mail/mail.service';
 import { ApiConfigService } from './services/api-config.service';

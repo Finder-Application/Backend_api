@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Accounts } from 'database/entities/Accounts';
+import { CommentNotifications } from 'database/entities/CommentNotifications';
+import { Comments } from 'database/entities/Comments';
+import { PostNotifications } from 'database/entities/PostNotifications';
+import { Posts } from 'database/entities/Posts';
+import { RelevantNetworkPosts } from 'database/entities/RelevantNetworkPosts';
+import { SubComments } from 'database/entities/SubComments';
+import { Users } from 'database/entities/Users';
 import { isNil } from 'lodash';
-
 import { SnakeNamingStrategy } from '../../snake-naming.strategy';
 
 @Injectable()
@@ -66,8 +73,18 @@ export class ApiConfigService {
       password: this.getString('DB_PASSWORD'),
       database: this.getString('DB_DATABASE'),
       logging: this.getBoolean('ENABLE_ORM_LOGS'),
-      entities: [__dirname + '/../../database/entities/*{.ts,.js}'],
+      entities: [
+        Accounts,
+        Comments,
+        CommentNotifications,
+        PostNotifications,
+        Users,
+        SubComments,
+        RelevantNetworkPosts,
+        Posts,
+      ],
       namingStrategy: new SnakeNamingStrategy(),
+      synchronize: false,
     };
   }
 
