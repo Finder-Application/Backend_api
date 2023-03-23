@@ -40,4 +40,4 @@ jobs:
           script_stop: true
           script: |
             cd build
-            docker-compose up backend_api --build
+            docker-compose up backend_api --build -d
