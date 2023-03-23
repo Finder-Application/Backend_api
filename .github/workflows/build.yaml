@@ -27,7 +27,7 @@ jobs:
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/finder-API:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/finder-api:latest
 
       # - name: executing remote ssh commands using password
       #   uses: appleboy/ssh-action@master
