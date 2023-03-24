@@ -40,4 +40,5 @@ jobs:
           script_stop: true
           script: |
             cd build
+            docker pull cinny09/backend_api
             docker-compose up backend_api --build -d
