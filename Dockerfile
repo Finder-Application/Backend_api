@@ -29,7 +29,7 @@
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
 
-FROM node:lts AS development
+FROM node:16-alpine AS development
 # RUN npm install -g pnpm
 # RUN apk add python3 make g++
 # # Set environment variable for Python
@@ -49,7 +49,7 @@ USER node
 # BUILD FOR PRODUCTION
 ###################
 
-FROM node:lts As build
+FROM node:16-alpine As build
 WORKDIR /usr/src/app
 
 COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
