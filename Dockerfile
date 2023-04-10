@@ -30,19 +30,18 @@
 ###################
 
 FROM node:lts AS development
-RUN npm install -g pnpm
+# RUN npm install -g pnpm
 # RUN apk add python3 make g++
 # # Set environment variable for Python
 # ENV PYTHON /usr/bin/python3
 
 WORKDIR /usr/src/app
 
-COPY --chown=node:node pnpm-lock.yaml ./
-
-RUN pnpm fetch --prod
+COPY --chown=node:node package.json ./
+COPY --chown=node:node yarn.lock ./
 
 COPY --chown=node:node . .
-RUN pnpm install
+RUN yarn
 
 USER node
 
