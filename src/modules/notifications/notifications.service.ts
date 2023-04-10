@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageDto } from 'common/dto/page.dto';
+import { ResponseSuccessDto } from 'common/dto/response.dto';
 import { CommentNotifications } from 'database/entities/CommentNotifications';
 import { PostNotifications } from 'database/entities/PostNotifications';
 import { Posts } from 'database/entities/Posts';
 import { Users } from 'database/entities/Users';
+import { firebase } from 'googleapis/build/src/apis/firebase';
 import { PostPageOptionsDto } from 'modules/post/dtos/post-page-options.dto';
 import { Repository } from 'typeorm';
 import {
@@ -12,6 +14,10 @@ import {
   NotificationCmtDto,
   NotificationPostDto,
 } from './dtos/notification.dto';
+
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
+import { FirebaseService } from 'modules/firebase/firebase.service';
 
 @Injectable()
 export class NotificationService {
@@ -24,6 +30,9 @@ export class NotificationService {
     private usersRepository: Repository<Users>,
     @InjectRepository(Posts)
     private postRepository: Repository<Posts>,
+    @InjectRedis('persist')
+    private readonly redis: Redis,
+    private firebase: FirebaseService,
   ) {}
 
   //TODO: count all notification
@@ -131,5 +140,32 @@ export class NotificationService {
     if (queryBuilder) {
       return new NotificationCmtDto(queryBuilder);
     }
+  }
+
+  async installFCM(userId: number, token: string) {
+    await this.redis.del(userId.toString() + '_token');
+    const data = await this.redis.sadd(
+      userId.toString() + '_token',
+      token,
+      'forever',
+    );
+    return new ResponseSuccessDto('installFCM success', data);
+  }
+
+  async pushNotification(userId: number, title: string, body: string) {
+    const userToken = await this.redis.smembers(userId.toString() + '_token');
+
+    try {
+      await this.firebase.fcm.sendToDevice(userToken, {
+        notification: {
+          title,
+          body,
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException('Token not valid');
+    }
+
+    return new ResponseSuccessDto('Send notification success', {});
   }
 }

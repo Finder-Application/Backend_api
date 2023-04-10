@@ -9,6 +9,7 @@ import { AuthModule } from 'modules/auth/auth.module';
 import { NotificationController } from './notification.controller';
 import { NotificationGateway } from './notifications.getway';
 import { NotificationService } from './notifications.service';
+import { FirebaseModule } from 'modules/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { NotificationService } from './notifications.service';
       Comments,
     ]),
     AuthModule,
+    FirebaseModule,
   ],
   controllers: [NotificationController],
   providers: [NotificationService, NotificationGateway],

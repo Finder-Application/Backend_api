@@ -1,4 +1,4 @@
-import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import {
   BadRequestException,
   Injectable,
@@ -12,6 +12,7 @@ import { Accounts } from 'database/entities/Accounts';
 import { Users } from 'database/entities/Users';
 import { Auth, google } from 'googleapis';
 import { ISocialInterface } from 'interfaces/social.interface';
+import Redis from 'ioredis';
 import { MailService } from 'modules/mail/mail.service';
 import { UserDto } from 'modules/user/dtos/user.dto';
 import { GeneratorService } from 'shared/services/generator.service';
@@ -40,7 +41,7 @@ export class AuthService {
     private usersRepository: Repository<Users>,
     private generator: GeneratorService,
     private validator: ValidatorService,
-    @InjectRedis() private readonly redis: Redis,
+    @InjectRedis('persist') private readonly redis: Redis,
     private mailService: MailService,
   ) {
     this.oauthClient = new google.auth.OAuth2(

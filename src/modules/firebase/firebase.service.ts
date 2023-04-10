@@ -7,6 +7,7 @@ import { ApiConfigService } from 'shared/services/api-config.service';
 @Injectable()
 export class FirebaseService implements OnModuleInit {
   private fireStore: admin.firestore.Firestore;
+  public fcm :admin.messaging.Messaging;
   private collection = 'faces';
   constructor(private apiConfig: ApiConfigService) {}
 
@@ -15,6 +16,7 @@ export class FirebaseService implements OnModuleInit {
       credential: admin.credential.cert(this.apiConfig.firebaseConfig),
     });
     this.fireStore = admin.app().firestore();
+    this.fcm = admin.app().messaging();
   }
 
   async saveDescriptors(

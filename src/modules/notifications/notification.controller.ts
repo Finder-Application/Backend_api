@@ -1,9 +1,17 @@
-import { Controller, Get, Query, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PageDto } from 'common/dto/page.dto';
 import { ApiPageOkResponse, GetSession } from 'decorators';
 import { Session } from 'interfaces/request';
 import { PostPageOptionsDto } from 'modules/post/dtos/post-page-options.dto';
+import { InstallFCM, PushMessages } from './dtos/installFCM.dto';
 import {
   CountNotificationDto,
   NotificationCmtDto,
@@ -53,6 +61,23 @@ export class NotificationController {
     return this.notiService.getPostNotifications(
       session.userId,
       postsPageOptionsDto,
+    );
+  }
+
+  @Post('/install-fcm')
+  installFCM(@Body() installFCM: InstallFCM, @GetSession() session: Session) {
+    return this.notiService.installFCM(session.userId, installFCM.token);
+  }
+
+  @Get('/push-notification')
+  pushNotification(
+    @GetSession() session: Session,
+    @Query() message: PushMessages,
+  ) {
+    return this.notiService.pushNotification(
+      session.userId,
+      message.title,
+      message.body,
     );
   }
 }

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
+
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -39,7 +41,8 @@ export class NotificationGateway
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
-    @InjectRedis() private readonly redis: Redis,
+    @InjectRedis()
+    private readonly redis: Redis,
     @InjectRepository(Comments)
     private commentsRepository: Repository<Comments>,
     @InjectRepository(Posts)
@@ -180,6 +183,12 @@ export class NotificationGateway
             `${userCreateComment.lastName} reply on your comment`,
           );
 
+        await this.notificationService.pushNotification(
+          userIdCreateComment,
+          'New Comment',
+          `${userCreateComment.lastName} reply on your comment`,
+        );
+
         const roomUserCreateComment = this.getRoomNotify(userIdCreateComment);
         // push notification for user create comment
         if (commentNotificationForUserCreateComment) {
@@ -205,6 +214,12 @@ export class NotificationGateway
             commentId,
             `${userCreateComment.lastName} reply on your post`,
           );
+
+        await this.notificationService.pushNotification(
+          userIdCreatePost,
+          'New Comment',
+          `${userCreateComment.lastName} reply on your post`,
+        );
 
         const roomUserCreatePost = this.getRoomNotify(userIdCreatePost);
         // push notification for user create comment
@@ -296,6 +311,12 @@ export class NotificationGateway
           commentId,
           `${userCreateComment.userName} commented on your post`,
         );
+
+      await this.notificationService.pushNotification(
+        userIdCreatePost,
+        'New Comment',
+        `${userCreateComment.userName} commented on your post`,
+      );
 
       // push notification for user create post
       const nameRoom = this.getRoomNotify(userIdCreatePost);
