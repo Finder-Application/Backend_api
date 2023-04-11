@@ -40,5 +40,5 @@ jobs:
           script_stop: true
           script: |
             cd build
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/finder-api:latest
-            docker-compose up backend_api --build -d
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/finder-api:latest
+            sudo docker compose up backend_api --build -d
