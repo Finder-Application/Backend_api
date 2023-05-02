@@ -96,22 +96,30 @@ export class AuthService {
   }
 
   async loginByGoogle(loginDto: UserLoginGGDto): Promise<LoginPayloadDto> {
-    let ticket = await this.oauthClient.getTokenInfo(loginDto.idToken);
+    let ticket: Auth.TokenInfo;
+    try {
+      ticket = await this.oauthClient.getTokenInfo(loginDto.idToken);
 
-    if (!ticket) {
+      return this.handlerWithGoogle({
+        id: ticket.sub || '',
+        email: ticket.email,
+        firstName: '',
+        lastName: ticket.email?.split('@')[0] || '',
+      });
+    } catch {
       ticket = jwt_decode(loginDto.idToken);
-    }
 
-    if (!ticket) {
-      throw new BadRequestException('Your token google is invalid');
-    }
+      if (!ticket) {
+        throw new BadRequestException('Your token google is invalid');
+      }
 
-    return this.handlerWithGoogle({
-      id: ticket.sub || '',
-      email: ticket.email,
-      firstName: '',
-      lastName: ticket.email?.split('@')[0] || '',
-    });
+      return this.handlerWithGoogle({
+        id: ticket.sub || '',
+        email: ticket.email,
+        firstName: '',
+        lastName: ticket.email?.split('@')[0] || '',
+      });
+    }
   }
 
   async register(userRegisterDto: UserRegisterDto): Promise<LoginPayloadDto> {
