@@ -96,10 +96,10 @@ export class AuthService {
   }
 
   async loginByGoogle(loginDto: UserLoginGGDto): Promise<LoginPayloadDto> {
-    let ticket: Auth.TokenInfo = jwt_decode(loginDto.idToken);
+    let ticket = await this.oauthClient.getTokenInfo(loginDto.idToken);
 
     if (!ticket) {
-      ticket = await this.oauthClient.getTokenInfo(loginDto.idToken);
+      ticket = jwt_decode(loginDto.idToken);
     }
 
     if (!ticket) {
