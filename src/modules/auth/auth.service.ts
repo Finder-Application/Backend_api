@@ -13,6 +13,7 @@ import { Users } from 'database/entities/Users';
 import { Auth, google } from 'googleapis';
 import { ISocialInterface } from 'interfaces/social.interface';
 import Redis from 'ioredis';
+import jwt_decode from 'jwt-decode';
 import { MailService } from 'modules/mail/mail.service';
 import { UserDto } from 'modules/user/dtos/user.dto';
 import { GeneratorService } from 'shared/services/generator.service';
@@ -95,7 +96,11 @@ export class AuthService {
   }
 
   async loginByGoogle(loginDto: UserLoginGGDto): Promise<LoginPayloadDto> {
-    const ticket = await this.oauthClient.getTokenInfo(loginDto.idToken);
+    let ticket = jwt_decode(loginDto.idToken);
+
+    if (!ticket) {
+      ticket = await this.oauthClient.getTokenInfo(loginDto.idToken);
+    }
 
     if (!ticket) {
       throw new BadRequestException('Your token google is invalid');
