@@ -144,11 +144,7 @@ export class NotificationService {
 
   async installFCM(userId: number, token: string) {
     await this.redis.del(userId.toString() + '_token');
-    const data = await this.redis.sadd(
-      userId.toString() + '_token',
-      token,
-      'forever',
-    );
+    const data = await this.redis.sadd(userId.toString() + '_token', token);
     return new ResponseSuccessDto('installFCM success', data);
   }
 
@@ -156,7 +152,8 @@ export class NotificationService {
     const userToken = await this.redis.smembers(userId.toString() + '_token');
 
     try {
-      await this.firebase.fcm.sendToDevice(userToken, {
+      await this.firebase.fcm.send({
+        token: userToken[0],
         notification: {
           title,
           body,

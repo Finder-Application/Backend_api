@@ -158,7 +158,7 @@ export class ApiConfigService {
   get firebaseConfig() {
     return {
       projectId: this.get('FIREBASE_PROJECT_ID'),
-      privateKey: this.get('FIREBASE_PRIVATE_KEY').replace(/\\n/g, '\n'),
+      privateKey: this.get('FIREBASE_PRIVATE_KEY'),
       clientEmail: this.get('FIREBASE_CLIENT_EMAIL'),
     };
   }
