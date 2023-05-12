@@ -35,7 +35,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.KEY_PEM }}
+          password: ${{ secrets.SSH_PASSWORD }}
           sync: true
           script_stop: true
           script: |
