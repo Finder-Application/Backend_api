@@ -208,16 +208,19 @@ export class PostService {
     const postData = await this.postRepository.findOne({
       where: { id, isActive: true, userId },
     });
+
     if (!postData) {
       throw new PostNotFoundException();
     }
+
     const { relevantPosts } = postData;
+
     if (!relevantPosts) {
       return [];
     }
 
     const relevantPostsInfo = relevantPosts
-      .split(',')
+      .split(';')
       .filter(item => item.trim())
       .map(
         item =>
@@ -226,6 +229,7 @@ export class PostService {
             similar: number;
           },
       );
+
     const posts = await this.postRepository.find({
       where: {
         id: In<number>(relevantPostsInfo.map(item => item.post_id)),
