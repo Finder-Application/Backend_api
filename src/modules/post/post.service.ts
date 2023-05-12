@@ -217,7 +217,7 @@ export class PostService {
     }
 
     const relevantPostsInfo = relevantPosts
-      .split(';')
+      .split(',')
       .filter(item => item.trim())
       .map(
         item =>
