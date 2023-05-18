@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class InstallFCM {
   @ApiProperty()
@@ -15,4 +15,14 @@ export class PushMessages {
   @ApiProperty()
   @IsString()
   readonly body: string;
+}
+
+export class ReadNoti {
+  @ApiProperty()
+  @IsNumber()
+  readonly id: number;
+
+  @ApiProperty()
+  @IsString()
+  readonly type: string;
 }

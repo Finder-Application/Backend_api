@@ -148,6 +148,27 @@ export class NotificationService {
     return new ResponseSuccessDto('installFCM success', data);
   }
 
+  async seenNotification(notiId: number, type: string) {
+    const checkBeforeUpdate = await (type === 'post'
+      ? this.postNotiRepository
+      : this.comNotiRepository
+    ).findOne({
+      where: {
+        id: notiId,
+      },
+    });
+
+    if (checkBeforeUpdate?.seen) {
+      return;
+    }
+
+    await (type === 'post'
+      ? this.postNotiRepository.update(notiId, { seen: true })
+      : this.comNotiRepository.update(notiId, { seen: true }));
+
+    return new ResponseSuccessDto('seenNotification success');
+  }
+
   async pushNotification(userId: number, title: string, body: string) {
     const userToken = await this.redis.smembers(userId.toString() + '_token');
 

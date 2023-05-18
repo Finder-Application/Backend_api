@@ -11,7 +11,7 @@ import { PageDto } from 'common/dto/page.dto';
 import { ApiPageOkResponse, GetSession } from 'decorators';
 import { Session } from 'interfaces/request';
 import { PostPageOptionsDto } from 'modules/post/dtos/post-page-options.dto';
-import { InstallFCM, PushMessages } from './dtos/installFCM.dto';
+import { InstallFCM, PushMessages, ReadNoti } from './dtos/installFCM.dto';
 import {
   CountNotificationDto,
   NotificationCmtDto,
@@ -67,6 +67,11 @@ export class NotificationController {
   @Post('/install-fcm')
   installFCM(@Body() installFCM: InstallFCM, @GetSession() session: Session) {
     return this.notiService.installFCM(session.userId, installFCM.token);
+  }
+
+  @Post('/seen-notification')
+  readNotification(@Body() readNoti: ReadNoti) {
+    return this.notiService.seenNotification(readNoti.id, readNoti.type);
   }
 
   @Get('/push-notification')
