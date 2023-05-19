@@ -185,7 +185,7 @@ export class NotificationService {
           body,
         },
         data: {
-          postId: postId,
+          postId: postId.toString(),
         },
       });
     } catch (error) {
