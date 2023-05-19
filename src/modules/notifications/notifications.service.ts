@@ -169,7 +169,12 @@ export class NotificationService {
     return new ResponseSuccessDto('seenNotification success');
   }
 
-  async pushNotification(userId: number, title: string, body: string) {
+  async pushNotification(
+    userId: number,
+    title: string,
+    body: string,
+    postId: number,
+  ) {
     const userToken = await this.redis.smembers(userId.toString() + '_token');
 
     try {
@@ -178,6 +183,9 @@ export class NotificationService {
         notification: {
           title,
           body,
+        },
+        data: {
+          postId: postId,
         },
       });
     } catch (error) {

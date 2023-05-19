@@ -83,6 +83,7 @@ export class NotificationController {
       session.userId,
       message.title,
       message.body,
+      1,
     );
   }
 }

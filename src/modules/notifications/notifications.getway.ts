@@ -187,6 +187,7 @@ export class NotificationGateway
           userIdCreateComment,
           'New Comment',
           `${userCreateComment.lastName} reply on your comment`,
+          postId,
         );
 
         const roomUserCreateComment = this.getRoomNotify(userIdCreateComment);
@@ -219,6 +220,7 @@ export class NotificationGateway
           userIdCreatePost,
           'New Comment',
           `${userCreateComment.lastName} reply on your post`,
+          postId,
         );
 
         const roomUserCreatePost = this.getRoomNotify(userIdCreatePost);
@@ -316,6 +318,7 @@ export class NotificationGateway
         userIdCreatePost,
         'New Comment',
         `${userCreateComment.userName} commented on your post`,
+        postId,
       );
 
       // push notification for user create post
