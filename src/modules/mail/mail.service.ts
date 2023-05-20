@@ -15,6 +15,7 @@ export class MailService {
     this.mailer.fromTitle = 'Finder App'; // Set the name you would like to send from
     this.mailer.init();
   }
+
   async sendCodeOtp(mail: string, otpCode: string) {
     try {
       const to = mail;
