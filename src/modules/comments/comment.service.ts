@@ -125,6 +125,8 @@ export class CommentService {
       .leftJoinAndSelect('comments.subComments', 'sub')
       .getMany();
 
+    console.log('totalComment', totalComment);
+
     return {
       total: totalComment.reduce(
         (acc, cur) => acc + cur.subComments.length + 1,
