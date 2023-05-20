@@ -183,13 +183,6 @@ export class NotificationGateway
             `${userCreateComment.lastName} reply on your comment`,
           );
 
-        await this.notificationService.pushNotification(
-          userIdCreateComment,
-          'New Comment',
-          `${userCreateComment.lastName} reply on your comment`,
-          postId,
-        );
-
         const roomUserCreateComment = this.getRoomNotify(userIdCreateComment);
         // push notification for user create comment
         if (commentNotificationForUserCreateComment) {
@@ -200,6 +193,14 @@ export class NotificationGateway
               data: commentNotificationForUserCreateComment,
             }),
           );
+
+          await this.notificationService.pushNotification(
+            userIdCreateComment,
+            'New Comment',
+            `${userCreateComment.lastName} reply on your comment`,
+            postId,
+          );
+
           this.server.to(roomUserCreateComment).emit('increase-notification');
         }
 
@@ -216,13 +217,6 @@ export class NotificationGateway
             `${userCreateComment.lastName} reply on your post`,
           );
 
-        await this.notificationService.pushNotification(
-          userIdCreatePost,
-          'New Comment',
-          `${userCreateComment.lastName} reply on your post`,
-          postId,
-        );
-
         const roomUserCreatePost = this.getRoomNotify(userIdCreatePost);
         // push notification for user create comment
         if (commentNotificationForUserCreatePost) {
@@ -234,6 +228,13 @@ export class NotificationGateway
             }),
           );
           this.server.to(roomUserCreatePost).emit('increase-notification');
+
+          await this.notificationService.pushNotification(
+            userIdCreatePost,
+            'New Comment',
+            `${userCreateComment.lastName} reply on your post`,
+            postId,
+          );
         }
 
         return 0;
@@ -242,27 +243,19 @@ export class NotificationGateway
       // case 4 user create subComment is not user create post and user create comment
       // => push notification to user create post and user create comment
 
-      const [
-        commentNotificationForUserCreatePost,
-        commentNotificationForUserCreateComment,
-      ] = await Promise.all([
-        this.notificationService.createCommentNotification(
+      // 1 subComment
+      // 2 create comment
+      // 3 create post
+
+      const commentNotificationForUserCreatePost =
+        await this.notificationService.createCommentNotification(
           userIdCreatePost,
           postId,
           commentId,
           `${userCreateComment.lastName} commented on your post`,
-        ),
-
-        this.notificationService.createCommentNotification(
-          userIdCreateComment,
-          postId,
-          commentId,
-          `${userCreateComment.lastName} reply on your comment`,
-        ),
-      ]);
+        );
 
       const roomUserCreatePost = this.getRoomNotify(userIdCreatePost);
-      const roomUserCreateComment = this.getRoomNotify(userIdCreateComment);
 
       if (commentNotificationForUserCreatePost) {
         this.server.to(roomUserCreatePost).emit(
@@ -273,17 +266,44 @@ export class NotificationGateway
           }),
         );
         this.server.to(roomUserCreatePost).emit('increase-notification');
-      }
-      // push notification for user create comment
-      if (commentNotificationForUserCreateComment) {
-        this.server.to(roomUserCreateComment).emit(
-          'new-notification',
-          JSON.stringify({
-            type: 'comment',
-            data: commentNotificationForUserCreateComment,
-          }),
+
+        await this.notificationService.pushNotification(
+          userIdCreatePost,
+          'New Comment',
+          `${userCreateComment.lastName} commented on your post`,
+          postId,
         );
-        this.server.to(roomUserCreateComment).emit('increase-notification');
+      }
+
+      if (userIdCreatePost !== userIdCreateComment) {
+        const commentNotificationForUserCreateComment =
+          await this.notificationService.createCommentNotification(
+            userIdCreateComment,
+            postId,
+            commentId,
+            `${userCreateComment.lastName} reply on your comment`,
+          );
+
+        const roomUserCreateComment = this.getRoomNotify(userIdCreateComment);
+
+        // push notification for user create comment
+        if (commentNotificationForUserCreateComment) {
+          this.server.to(roomUserCreateComment).emit(
+            'new-notification',
+            JSON.stringify({
+              type: 'comment',
+              data: commentNotificationForUserCreateComment,
+            }),
+          );
+          this.server.to(roomUserCreateComment).emit('increase-notification');
+
+          await this.notificationService.pushNotification(
+            userIdCreateComment,
+            'New Comment',
+            `${userCreateComment.lastName} reply on your comment`,
+            postId,
+          );
+        }
       }
     } else {
       // create comment notification for user create post
@@ -314,13 +334,6 @@ export class NotificationGateway
           `${userCreateComment.userName} commented on your post`,
         );
 
-      await this.notificationService.pushNotification(
-        userIdCreatePost,
-        'New Comment',
-        `${userCreateComment.userName} commented on your post`,
-        postId,
-      );
-
       // push notification for user create post
       const nameRoom = this.getRoomNotify(userIdCreatePost);
 
@@ -334,6 +347,13 @@ export class NotificationGateway
         );
 
         this.server.to(nameRoom).emit('increase-notification');
+
+        await this.notificationService.pushNotification(
+          userIdCreatePost,
+          'New Comment',
+          `${userCreateComment.userName} commented on your post`,
+          postId,
+        );
       }
     }
   }

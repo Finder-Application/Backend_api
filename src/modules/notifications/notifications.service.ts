@@ -175,9 +175,9 @@ export class NotificationService {
     body: string,
     postId: number,
   ) {
-    const userToken = await this.redis.smembers(userId.toString() + '_token');
-
     try {
+      const userToken = await this.redis.smembers(userId.toString() + '_token');
+
       await this.firebase.fcm.send({
         token: userToken[0],
         notification: {
