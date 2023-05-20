@@ -161,7 +161,9 @@ export class ApiConfigService {
   get firebaseConfig() {
     return {
       projectId: this.get('FIREBASE_PROJECT_ID'),
-      privateKey: this.get('FIREBASE_PRIVATE_KEY').replace(/\\n/g, '\n'),
+      privateKey:
+        // eslint-disable-next-line max-len
+        '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDSz2nGOaJJRVhJ\nPz1HE8ZJguRG9Le4rnhwUH5UaAZhGgOgHCkipNkRCyq14iTix2nXuOxpyWvz69Uy\nigloovTlFZasTHof9gWCRVNnLQB4nYJRxqW73n2L8Nx97XW9a9fxTOjjJRtOpdG0\nC9w/Txf2Dqpiyrx2QF1BRZNvhO+YLarrI/Sk9lBRzbuODZ1eVm/nlh/buOCZrRjS\nXCxZiuGm4hLe3ZVvppCFNx/+NLZj+wwua53Qt7vHPSwJw126eNoI5y0xyjTimc2W\nzWj/K5mQjmQ2a70G3fFe9T4bXsHwZT4paMX/TZNJ6zO8e+dG1zAiiPZG7bxhA4n9\nT9DW6jppAgMBAAECggEAGIyUmuPCizGO/c2mXUj3W/9pBb3RCMnRhvPKuFnaV1O0\nFSC+ZhVIHWjdXwuwI7QY9mkHp+yPvJqrq8xhGt0yM1zDnHo19ROdcd2QoDjgf4tJ\nHiyJx5JZ8LJafPQqlEXTInukObJsJwkene7NJda4ObxcuW82SfeGHJglepTCoYgG\nrf5dIo8ORPcoxWWrcywkjyYpJNIYEJzjqTgl/BSWhuv+hIaiiI8zOsmdtqCQ29XA\nDpckP/P1KFmSjQ9vR3va9OhPDubVYa+0oORRqRbemrq5AS/nqqsCFn/E7+gjEu58\n+D5EDxiTekEKYT8MZ+ktbmEvuzEfU1qDn1XJen0L4QKBgQD4zQowQjgscI5yoczG\n2zbSGzW7B4MM2zDkMYqOQ3PVYUk+CWnbC82mrAYJCwg0IIp6IqsQNgeLh5O6KKAm\nnAlucjBrRVZs6aWljf63p2+4LLg8IDP3H+NzGd0v2EEtsNbMt6vvJRZARGC48g+L\n8cjwArKqu0JVtq9mXD7IUmPTIQKBgQDY6PZJTfXXO3GmohlSBlamPMG6M7i/RXp7\nQkMGiY+ppBe0EtxnIfbVPqUnh21IKCPY9URjhU5AEAFuzkYkyTAwQytFqKXNQ2el\nApdNX52Z1Hb5IhDiXZ23QYOIA9u87QZRhRWZDqpPHYYhmwqPSL4Nn2dDJrVb0r3N\nVcodrbhGSQKBgBTDH4+JZyCmP+zm/ay2jGuaI7C43sHK5NiWHcbjcB4lYTRRGslR\nwdaf0l0c05FuCcBJdlcC+zw0kypcy4iNSugxlULOZXjvQoh/QftXeKY47SLvWQbN\nXXC0ftXISSAj+rjYtvtc7+9rBVtJr+xwv+DviLNgrxdyCE8VcZPL9FKhAoGADovY\n8GONCAkRfxZB0nFgYDeU2lLboeAb7aYs7oRNIRhDCq11IGlzrytLUhJP7tXaSZNx\nKadn7v3jyrWEmLTxSVtHzJ0ZuWE60yMQWH0ACa/o5p41OakDiaWYF4gCtXHDybW+\nFAyauUGGnDxUgfVj4W/+Mc+nu+evGNUW/9SFlhkCgYEAiVBDJ91pmSpc+clFZ7Fa\njS2sfENlXFxF0h1XF0EBTMT0qtHZNZ5eBmEFs/tJ1MS1rNQ0zW656iXZjmC36m85\nqjcgbAH2ol2GQz3Q+RQ8RauDL/7ysB24NJ4KWPqI8a6RzxZxPOjbUb8FgRfGngcG\nC0Nkn/2pzelKPdnRR6d2ezU=\n-----END PRIVATE KEY-----\n',
       clientEmail: this.get('FIREBASE_CLIENT_EMAIL'),
     };
   }
