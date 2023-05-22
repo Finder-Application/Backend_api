@@ -384,6 +384,13 @@ export class NotificationGateway
         }),
       );
       this.server.to(nameRoom).emit('increase-notification');
+
+      await this.notificationService.pushNotification(
+        parse.user_id,
+        'Found related a post',
+        `Your post matched with a post has title : "${parse.title}"`,
+        parse.post_id,
+      );
     }
   }
 }
