@@ -34,7 +34,7 @@ export class NotificationController {
     @GetSession() session: Session,
   ): Promise<CountNotificationDto> {
     console.info(session);
-    return this.notiService.countNotifications(1);
+    return this.notiService.countNotifications(session.userId);
   }
 
   @Get('/comments')
