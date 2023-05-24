@@ -376,6 +376,9 @@ export class NotificationGateway
 
     if (data) {
       const dataSendToClient = new NotificationPostDto(data);
+
+      console.log('1------->', dataSendToClient);
+
       this.server.to(nameRoom).emit(
         'new-notification',
         JSON.stringify({
@@ -383,15 +386,28 @@ export class NotificationGateway
           data: dataSendToClient,
         }),
       );
+
       this.server.to(nameRoom).emit('increase-notification');
 
-      await this.notificationService.pushNotification(
+      console.log(
+        '2------->',
         parse.user_id,
         'Found related a post',
         parse?.content || '',
-        // `Your post matched with a post has title : "${parse.title}"`,
         parse.post_id,
       );
+
+      try {
+        await this.notificationService.pushNotification(
+          parse.user_id,
+          'Found related a post',
+          parse?.content || '',
+          // `Your post matched with a post has title : "${parse.title}"`,
+          parse.post_id,
+        );
+      } catch (error) {
+        console.log('3------->', error);
+      }
     }
   }
 }
