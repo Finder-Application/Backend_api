@@ -226,7 +226,7 @@ export class PostService {
         item =>
           JSON.parse(item) as {
             post_id: number;
-            similar: number;
+            similarImage: number;
             similarText: number;
           },
       );
@@ -247,7 +247,7 @@ export class PostService {
           post,
           relevantPostsInfo.find(
             item => Number(item.post_id) === Number(post.id),
-          )?.similar,
+          )?.similarImage,
           relevantPostsInfo.find(
             item => Number(item.post_id) === Number(post.id),
           )?.similarText,
