@@ -6,7 +6,6 @@ import { CommentNotifications } from 'database/entities/CommentNotifications';
 import { PostNotifications } from 'database/entities/PostNotifications';
 import { Posts } from 'database/entities/Posts';
 import { Users } from 'database/entities/Users';
-import { firebase } from 'googleapis/build/src/apis/firebase';
 import { PostPageOptionsDto } from 'modules/post/dtos/post-page-options.dto';
 import { Repository } from 'typeorm';
 import {
@@ -174,6 +173,7 @@ export class NotificationService {
     title: string,
     body: string,
     postId: number,
+    type: 'post' | 'comment',
   ) {
     try {
       const userToken = await this.redis.smembers(userId.toString() + '_token');
@@ -186,6 +186,7 @@ export class NotificationService {
         },
         data: {
           postId: postId.toString(),
+          type,
         },
       });
     } catch (error) {

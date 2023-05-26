@@ -84,6 +84,7 @@ export class NotificationController {
       message.title,
       message.body,
       1,
+      'comment',
     );
   }
 }

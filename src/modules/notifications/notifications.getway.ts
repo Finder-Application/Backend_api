@@ -199,6 +199,7 @@ export class NotificationGateway
             'New Comment',
             `${userCreateComment.lastName} reply on your comment`,
             postId,
+            'comment',
           );
 
           this.server.to(roomUserCreateComment).emit('increase-notification');
@@ -234,6 +235,7 @@ export class NotificationGateway
             'New Comment',
             `${userCreateComment.lastName} reply on your post`,
             postId,
+            'comment',
           );
         }
 
@@ -272,6 +274,7 @@ export class NotificationGateway
           'New Comment',
           `${userCreateComment.lastName} commented on your post`,
           postId,
+          'comment',
         );
       }
 
@@ -302,6 +305,7 @@ export class NotificationGateway
             'New Comment',
             `${userCreateComment.lastName} reply on your comment`,
             postId,
+            'comment',
           );
         }
       }
@@ -353,6 +357,7 @@ export class NotificationGateway
           'New Comment',
           `${userCreateComment.userName} commented on your post`,
           postId,
+          'comment',
         );
       }
     }
@@ -389,14 +394,6 @@ export class NotificationGateway
 
       this.server.to(nameRoom).emit('increase-notification');
 
-      console.log(
-        '2------->',
-        parse.user_id,
-        'Found related a post',
-        parse?.content || '',
-        parse.post_id,
-      );
-
       try {
         await this.notificationService.pushNotification(
           parse.user_id,
@@ -404,10 +401,9 @@ export class NotificationGateway
           parse?.content || '',
           // `Your post matched with a post has title : "${parse.title}"`,
           parse.post_id,
+          'post',
         );
-      } catch (error) {
-        console.log('3------->', error);
-      }
+      } catch () {}
     }
   }
 }
