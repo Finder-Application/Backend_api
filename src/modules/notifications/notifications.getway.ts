@@ -403,7 +403,10 @@ export class NotificationGateway
           parse.post_id,
           'post',
         );
-      } catch () {}
+      } catch (error: any) {
+        // eslint-disable-next-line no-console
+        console.log('error', error);
+      }
     }
   }
 }
